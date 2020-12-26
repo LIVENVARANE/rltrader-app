@@ -172,6 +172,11 @@ async function selectColor(color) {
             colorbutton.innerHTML = "Purple";
             colorbutton.style.background = "purple";
             break;
+        case "default":
+            colorbutton.innerHTML = "Default";
+            colorbutton.style.background = "#313131";
+            colorbutton.style.color = "white";
+            break;
         default:
             alert("An error hapenned, please restart RLTrader. Error code: WCSCF");
             stop = true;
@@ -181,6 +186,11 @@ async function selectColor(color) {
         $("#colorpicker").animate({ opacity: 0 }, "fast", function() {
             colorpicker.style.visibility = "hidden";
         });
-        priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML, "/" + color, "currentPriceRange") + " Cr";
+        if(color == "default") {
+            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML, "", "currentPriceRange") + " Cr";
+        } else {
+            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML, "/" + color, "currentPriceRange") + " Cr";
+        }
+        
     }
 }

@@ -24,98 +24,80 @@ async function searchForItem() {
         var itemcolor = itemsearch.substring(itemsearch.indexOf("/") + 1).toLowerCase();
         switch(itemcolor) {
             case "black":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "white":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "tw":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/white";
                 break;
             case "titanium_white":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/white";
                 break;
             case "grey":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "gray":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/grey";
                 break;
             case "crimson":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "pink":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "cobalt":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "sblue":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "sb":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/sblue";
                 break;
             case "sky_blue":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/sblue";
                 break;
             case "sienna":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "bs":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/sienna";
                 break;
             case "burnt_sienna":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/sienna";
                 break;
             case "saffron":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "lime":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "fgreen":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "fg":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/fgreen";
                 break;
             case "forest_green":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/fgreen";
                 break;
             case "orange":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
             case "purple":
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "/" + itemcolor;
                 break;
+            case "default":
+                itemcolor = "/default";
+                break;
             default:
-                itemsearch = itemsearch.replace("/" + itemcolor, "");
                 itemcolor = "";
                 break;
         }
+        itemsearch = itemsearch.replace(itemcolor, "");
+
     }
     else { itemcolor = ""; }
     //now we have the users wanted color
@@ -139,7 +121,7 @@ async function searchForItem() {
     availableColors = availableColors.replaceAll(" no", ""); //we get all the colors that exists for that item
 
     if(availableColors == "") {
-        alert("This item does not exist, make sure you typed the name correctly.");
+        alert("This item does not exist or it is not tradeable, make sure you typed the name correctly.");
         aiwLoadingWheel.style.visibility = "hidden";
     } else {
         var stockAC = availableColors.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue").substring(1);
@@ -228,6 +210,11 @@ async function searchForItem() {
                     colorbutton.innerHTML = "Purple";
                     colorbutton.style.background = "purple";
                     break;
+                case "/default":
+                    colorbutton.innerHTML = "Default";
+                    colorbutton.style.background = "#313131";
+                    colorbutton.style.color = "white";
+                    itemcolor = ""; //for the price var just under
             }
 
             var price = await doItemRequest(itemsearch, itemcolor, "currentPriceRange") + " Cr"; //will set the price for the color the user has specified

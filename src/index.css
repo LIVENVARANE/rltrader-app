@@ -74,7 +74,7 @@ header span {
     display: inline-block;
     position: relative;
     left: 4px;
-    top: -21;
+    top: -8px;
     border-bottom: 3px solid gray;
     border-radius: 10px 0px 0px 10px;
     cursor: pointer;
@@ -98,7 +98,7 @@ header span {
     display: inline-block;
     position: relative;
     left: -4px;
-    top: -21;
+    top: -8px;
     border-bottom: 3px solid gray;
     border-radius: 0px 10px 10px 0px;
     cursor: pointer;
