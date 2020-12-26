@@ -1,0 +1,341 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Ubuntu', sans-serif;
+    user-select: none;
+}
+
+header {
+    background-color: #3B3B58;
+    height: 60;
+    padding: 0px 20px 0px 20px;
+    cursor: default;
+}
+
+header img {
+    height: 28px;
+    position: relative;
+    top: calc(50% - 14px);
+}
+
+header span {
+    color: white;
+    font-weight: bold;
+    font-size: 28px;
+    position: relative;
+    top: calc(50% - 18px);
+    margin-left: 7px;
+}
+
+#additemwindow {
+    visibility: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(66, 66, 66, 0.3);;
+}
+
+#additemwindow .aiw-container {
+    position: relative;
+    top: 10px;
+}
+
+#additemwindow .aiw-container #itemsearch {
+    resize: none;
+    border: none;
+    border-bottom: 3px solid gray;
+    height: 40px;
+    width: 500px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 33px;
+    -moz-appearance: none;
+    outline: 0px none transparent;
+
+    transition: ease border-color 0.5s;
+}
+
+#additemwindow .aiw-container #itemsearch:focus {
+    outline: 0;
+    border-color: #BC7C9C;
+}
+
+#additemwindow .aiw-container .close {
+    background-color: white;
+    height: 37px;
+    width: 40px;
+    display: inline-block;
+    position: relative;
+    left: 4px;
+    top: -21;
+    border-bottom: 3px solid gray;
+    border-radius: 10px 0px 0px 10px;
+    cursor: pointer;
+}
+
+#additemwindow .aiw-container .close:hover {
+    border-color: #BC7C9C;
+    color: #BC7C9C;
+}
+
+#additemwindow .aiw-container .close i {
+    position: relative;
+    top: 8px;
+    font-size: 22px;
+}
+
+#additemwindow .aiw-container .search {
+    background-color: white;
+    height: 37px;
+    width: 40px;
+    display: inline-block;
+    position: relative;
+    left: -4px;
+    top: -21;
+    border-bottom: 3px solid gray;
+    border-radius: 0px 10px 10px 0px;
+    cursor: pointer;
+}
+
+#additemwindow .aiw-container .search:hover {
+    border-color: #BC7C9C;
+    color: #BC7C9C;
+}
+
+#additemwindow .aiw-container .search i {
+    position: relative;
+    top: 8px;
+    font-size: 22px;
+}
+
+#additemwindow #aiw-loading {
+    width: 50px;
+    visibility: hidden;
+    position: absolute;
+    left: calc(50% - 25px);
+}
+
+#additemwindow #iteminfo {
+    visibility: hidden;
+    background-color: white;
+    border-radius: 10px;
+    width: 560px;
+    height: 440;
+    padding: 10px;
+    cursor: default;
+    border-bottom: 3px solid grey;
+}
+
+#additemwindow #iteminfo #colorpicker {
+    position: absolute;
+    width: 200px;
+    top: 208px;
+    left: 501px;
+    z-index: 1;
+    box-shadow: 0px 0px 15px -3px rgba(0,0,0,0.41);
+
+    visibility: hidden;
+}
+
+#additemwindow #iteminfo #colorpicker li {
+    background-color: grey;
+    list-style-type: none;
+    padding: 1px 9px;
+    cursor: pointer;
+
+    display: none;
+}
+
+#additemwindow #iteminfo #itemimage {
+    border-radius: 3px;
+    margin-right: 20px;
+    width: 100px;
+}
+
+#additemwindow #iteminfo h2 {
+    position: relative;
+    top: -85px;
+    left: 120px;
+    font-weight: normal;
+    display: inline;
+}
+
+#additemwindow #iteminfo h2 #colorbutton {
+    padding: 1px 9px;
+    border-radius: 3px;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(to right, #4776E6, #8e54e9);
+}
+
+.ie-footer h4 {
+    font-weight: bold;
+    text-align: center;
+}
+
+.ie-footer .additembutton {
+    background: linear-gradient(to right, #7A5980, #3B3B58);
+    font-weight: bold;
+    color: white;
+    border-radius: 15px;
+    font-size: 22px;
+    padding: 20px 40px;
+    text-align: center;
+    cursor: pointer;
+
+    transition: ease-out 0.5s border-radius;
+}
+
+.ie-footer .additembutton:hover {
+    border-radius: 25px;
+}
+
+#welcome-screen {
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #7A5980;
+
+    display: none;
+}
+
+#welcome-screen .title-container {
+    position: relative;
+    top: 250px;
+
+    animation: wt-enter 3s ease-out forwards;
+}
+
+@keyframes wt-enter {
+    0% { opacity: 0; }
+    40% { opacity: 1; top: 250px; }
+    100% { top: 50px; }
+
+}
+
+#welcome-screen .title-container img {
+    height: 34px;
+    position: relative;
+    top: 2px;
+    margin-right: 10px;
+}
+
+#welcome-screen .title-container h1 {
+    color: white;
+    font-size: 74px;
+    text-align: center;
+
+}
+
+#welcome-screen .title-container h2 {
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 42px;
+    opacity: 0.7;
+    position: relative;
+    top: -50px;
+}
+
+#welcome-screen .login-container {
+    width: 400px;
+    height: 250px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    opacity: 0;
+    
+    animation: ls-enter 0.7s ease-out 3.1s forwards;
+}
+
+@keyframes ls-enter {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+#welcome-screen .login-container h3 {
+    font-weight: lighter;
+    color: #3B3B58;
+    position: relative;
+    top: 15px;
+    margin-bottom: 30px;
+}
+
+#welcome-screen .login-container h5 {
+    font-weight: lighter;
+}
+
+#welcome-screen .login-container .lc-button {
+    padding: 20px 0px;
+    width: 300px;
+    font-weight: bold;
+    font-size: 22px;
+    margin: 10px;
+    border-radius: 15px;
+    cursor: pointer;
+
+    transition: ease-out 0.7s border-radius;
+}
+
+#welcome-screen .login-container #lc-username-field {
+    position: relative;
+    top: -200px;
+    border: none;
+    outline: 0px none transparent;
+    appearance: none;
+    width: 300px;
+    font-weight: bold;
+    font-size: 22px;
+    border-radius: 15px;
+    height: 66px;
+    text-align: center;
+    background: linear-gradient(to right, #7A5980, #3B3B58);
+    color: white;
+    display: none;
+}
+
+#welcome-screen .login-container .lc-button:hover {
+    border-radius: 20px;
+}
+
+#welcome-screen .login-container .lc-online {
+    background: linear-gradient(to right, #7A5980, #3B3B58);
+    color: white;
+}
+
+#welcome-screen .login-container .lc-offline {
+    background-color: white;
+}
+
+#alertbox {
+    padding: 7px 10px;
+    font-weight: bold;
+    background-color: #e74c3c;
+    color: white;
+    position: fixed;
+    top: 75px;
+    left: -999px;
+    border-radius: 7px;
+    opacity: 0;
+
+    animation: alertbox-pop 5s ease;
+    animation-play-state: paused;
+}
+
+@keyframes alertbox-pop {
+    0% { opacity: 0; }
+    1% { left: 15px; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    99% { opacity: 0; left: 15px; }
+    100% { left: -999px; }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "rltrader",
+    "version": "0.1.0",
+    "author": "LIVEN",
+    "description": "RLTrader app",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "dependencies": {}
+}

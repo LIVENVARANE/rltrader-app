@@ -1,0 +1,299 @@
+async function searchForItem() {
+    var itemsearch = document.getElementById('itemsearch').value.toLowerCase();
+    if(itemsearch == "") { return; }
+
+    var iteminfo = document.getElementById('iteminfo');
+    var itemnameLabel = document.getElementById('item-name');
+    var itemimage = document.getElementById('itemimage');
+    var colorbutton = document.getElementById('colorbutton');
+    var colorpicker = document.getElementById('colorpicker');
+    var rarityLabel = document.getElementById('rarity');
+    var typeLabel = document.getElementById('type');
+    var aiwLoadingWheel = document.getElementById('aiw-loading');
+    var priceLabel = document.getElementById('price');
+    var alertspan = document.getElementById('alertbox-span');
+    var alertbox = document.getElementById('alertbox');
+
+    colorpicker.style.visibility = "hidden";
+    iteminfo.style.visibility = "hidden";
+    aiwLoadingWheel.style.visibility = "visible";
+
+    //determining what color the user specifies (if he specifies one)
+    itemsearch = itemsearch.replaceAll(" ", "_");
+    if(itemsearch.includes('/')) {
+        var itemcolor = itemsearch.substring(itemsearch.indexOf("/") + 1).toLowerCase();
+        switch(itemcolor) {
+            case "black":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "white":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "tw":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/white";
+                break;
+            case "titanium_white":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/white";
+                break;
+            case "grey":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "gray":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/grey";
+                break;
+            case "crimson":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "pink":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "cobalt":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "sblue":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "sb":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/sblue";
+                break;
+            case "sky_blue":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/sblue";
+                break;
+            case "sienna":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "bs":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/sienna";
+                break;
+            case "burnt_sienna":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/sienna";
+                break;
+            case "saffron":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "lime":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "fgreen":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "fg":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/fgreen";
+                break;
+            case "forest_green":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/fgreen";
+                break;
+            case "orange":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            case "purple":
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "/" + itemcolor;
+                break;
+            default:
+                itemsearch = itemsearch.replace("/" + itemcolor, "");
+                itemcolor = "";
+                break;
+        }
+    }
+    else { itemcolor = ""; }
+    //now we have the users wanted color
+    //checking every color availability
+
+    var availableColors = "";
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/black");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/white");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/grey");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/crimson");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/pink");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/cobalt");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/sblue");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/sienna");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/saffron");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/lime");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/fgreen");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/orange");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "/purple");
+    availableColors = availableColors + " " + await doItemRequest(itemsearch, "");
+    availableColors = availableColors.replaceAll(" no", ""); //we get all the colors that exists for that item
+
+    if(availableColors == "") {
+        alert("This item does not exist, make sure you typed the name correctly.");
+        aiwLoadingWheel.style.visibility = "hidden";
+    } else {
+        var stockAC = availableColors.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue").substring(1);
+        var stockAC_withDefault = stockAC; //before removing default
+        if(stockAC == " default") {
+            var itemname = await doItemRequest(itemsearch, "", "itemName"); //we take the first color that is available because we just want the name (the color will not change the item name)
+            var itemPicURL = await doItemRequest(itemsearch, "", true);
+            var rarity = await doItemRequest(itemsearch, "", true);
+            var type = await doItemRequest(itemsearch, "", true);
+        } else {
+            stockAC = stockAC.replace("default", "");
+            var itemname = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], "itemName"); //we take the first color that is available because we just want the name (the color will not change the item name)
+            var itemPicURL = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+            var rarity = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+            var type = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+        }
+
+        rarity = rarity.substring(rarity.indexOf("<td>Rarity</td><td>") + 19);
+        rarity = rarity.substring(0, rarity.indexOf('</td></tr><tr><td>Type</td>'));
+        type = type.substring(type.indexOf("<td>Type</td><td>") + 17)
+        type = type.substring(0, type.indexOf('</td></tr><tr><td>Series</td>'));
+        itemPicURL = itemPicURL.substring(itemPicURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
+        itemPicURL = itemPicURL.substring(0, itemPicURL.indexOf('"'));
+
+        //SHOWING WINDOW OF ITEM
+        aiwLoadingWheel.style.visibility = "hidden";
+        iteminfo.style.visibility = "visible";
+        itemimage.src = itemPicURL;
+        itemnameLabel.innerHTML = itemname;
+        rarityLabel.innerHTML = "Rarity: " + rarity;
+        typeLabel.innerHTML = "Type: " + type;
+        document.getElementById('itemsearch').value = "";
+        if(availableColors.toLowerCase().includes(itemcolor.replace("sblue", "sky blue").replace("white", "titanium white").replace("fgreen", "forest green").replace("sienna", "burnt sienna").replace("/", "")) && itemcolor != "") {
+            switch(itemcolor) { //we know that the color the user has choosen exists, now we check what it is to select it
+                case "/black":
+                    colorbutton.innerHTML = "Black";
+                    colorbutton.style.background = "black";
+                    colorbutton.style.color = "white";
+                    break;
+                case "/white":
+                    colorbutton.innerHTML = "Titanium White";
+                    colorbutton.style.background = "#dbdbdb";
+                    break;
+                case "/grey":
+                    colorbutton.innerHTML = "Grey";
+                    colorbutton.style.background = "grey";
+                    break;
+                case "/crimson":
+                    colorbutton.innerHTML = "Crimson";
+                    colorbutton.style.background = "#de1b1b";
+                    break;
+                case "/pink":
+                    colorbutton.innerHTML = "Pink";
+                    colorbutton.style.background = "pink";
+                    break;
+                case "/cobalt":
+                    colorbutton.innerHTML = "Cobalt";
+                    colorbutton.style.background = "#1b5cde";
+                    break;
+                case "/sblue":
+                    colorbutton.innerHTML = "Sky Blue";
+                    colorbutton.style.background = "#09e9ed";
+                    break;
+                case "/sienna":
+                    colorbutton.innerHTML = "Burnt Sienna";
+                    colorbutton.style.background = "brown";
+                    break;
+                case "/saffron":
+                    colorbutton.innerHTML = "Saffron";
+                    colorbutton.style.background = "yellow";
+                    colorbutton.style.color = "black";
+                    break;
+                case "/lime":
+                    colorbutton.innerHTML = "Lime";
+                    colorbutton.style.background = "#07eb12";
+                    break;
+                case "/fgreen":
+                    colorbutton.innerHTML = "Forest Green";
+                    colorbutton.style.background = "#0d7522";
+                    break;
+                case "/orange":
+                    colorbutton.innerHTML = "Orange";
+                    colorbutton.style.background = "orange";
+                    break;
+                case "/purple":
+                    colorbutton.innerHTML = "Purple";
+                    colorbutton.style.background = "purple";
+                    break;
+            }
+
+            var price = await doItemRequest(itemsearch, itemcolor, "currentPriceRange") + " Cr"; //will set the price for the color the user has specified
+        }
+        else {
+            if(availableColors == " Default") { //the does not have any colors available (only default)
+                colorbutton.innerHTML = "Default";
+                colorbutton.style.background = "#313131";
+                colorbutton.style.color = "white";
+                var price = await doItemRequest(itemsearch, "", "currentPriceRange") + " Cr"; //getting the price for the default color
+            } else {
+                colorbutton.innerHTML = "Choose a color";
+                colorbutton.style.background = "linear-gradient(to right, #4776E6, #8e54e9)";
+                colorbutton.style.color = "white";
+                var price = "Please select a color";
+                if(itemcolor != "") { //the user specified a color but it does not exists
+                    alertspan.innerHTML = "The color you specified does not exists for this item.";
+                    alertbox.style.animationPlayState = "running";
+                }
+            }
+        }
+
+        priceLabel.innerHTML = price;
+
+        //removing colors in the colorpicker that does not exist for this item
+        stockAC_withDefault.split(" ").forEach(e => {
+            document.getElementById("cp-" + e).style.display = "list-item";
+            document.getElementById("cp-" + e).setAttribute('onclick', 'selectColor("' + e + '")');
+        });
+    }
+}
+                                                        //IF SPECIFIER = TRUE => WILL RETURN RAW RESPONSE
+function doItemRequest(item, color, specifier) { //item found, will output color name (default if no color specified), item not found, will output no AND if specifier is defined, will output the specifier for the item
+    return new Promise(resolve => {
+        const http = new XMLHttpRequest();
+        const url='https://rl.insider.gg/en/pc/' + item + color;
+        http.open("GET", url, !(!this));
+        http.setRequestHeader("upgrade-insecure-requests", "1");
+        http.setRequestHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        http.setRequestHeader("accept-language", "en-US;q=0.9,en;q=0.8");
+        http.send();
+
+        http.onreadystatechange = function() {
+            if(this.readyState == 4 && this.status == 200) {
+                var resp = http.responseText;
+                if(specifier == true) {
+                    resolve(resp);
+                } else {
+                    if(resp.includes("<title>PC Search | Rocket League Insider</title>")) { //this item with this color does not exists
+                        resolve("no");
+                    }
+                    else if(resp.includes("var itemData = {\"itemName\":\"")) { //this item with this color exists
+                        if(specifier === undefined) {
+                            if(color == "") { //no color were specified
+                                resolve("Default");
+                            } else {
+                                resp = resp.substring(resp.lastIndexOf(",\"itemColor\":\"") + 14);
+                                resolve(resp.substring(0, resp.indexOf('"')));
+                            }
+                        } else {
+                            resp = resp.substring(resp.lastIndexOf("\"" + specifier + "\":\"") + (4 + specifier.length));
+                            resolve(resp.substring(0, resp.indexOf('"')));
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
