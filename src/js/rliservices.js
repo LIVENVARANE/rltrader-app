@@ -97,7 +97,6 @@ async function searchForItem() {
                 break;
         }
         itemsearch = itemsearch.replace(/\/.*/,'');
-        alert(itemsearch);
     }
     else { itemcolor = ""; }
     //now we have the users wanted color
