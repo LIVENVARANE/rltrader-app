@@ -40,7 +40,7 @@ header span {
 
 #additemwindow .aiw-container {
     position: relative;
-    top: 10px;
+    top: -50px;
 }
 
 #additemwindow .aiw-container #itemsearch {

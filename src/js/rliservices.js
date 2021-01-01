@@ -148,6 +148,8 @@ async function searchForItem() {
         //SHOWING WINDOW OF ITEM
         aiwLoadingWheel.style.visibility = "hidden";
         iteminfo.style.visibility = "visible";
+        iteminfo.style.opacity = 0;
+        $("#iteminfo").animate({ opacity: 1 }, "fast");
         itemimage.src = itemPicURL;
         itemnameLabel.innerHTML = itemname;
         rarityLabel.innerHTML = "Rarity: " + rarity;

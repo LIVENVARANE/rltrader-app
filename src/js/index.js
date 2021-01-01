@@ -83,6 +83,7 @@ function startConfig(type) {
 function addItemWindow() {
     var aiw = document.getElementById('additemwindow'); //cp iteminfo
     if(aiw.style.visibility == "visible") {
+        $(".aiw-container").animate({ top: "-50px" }, "fast");
         $("#additemwindow").animate({ opacity: 0 }, "fast", function() {
             setTimeout(function () {
                 aiw.style.visibility = "hidden";
@@ -94,6 +95,7 @@ function addItemWindow() {
         aiw.style.visibility = "visible";
         aiw.style.opacity = 0;
         $("#additemwindow").animate({ opacity: 1 }, "fast");
+        $(".aiw-container").animate({ top: "10px" }, "fast");
     }
 }
 
