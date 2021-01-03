@@ -28,10 +28,6 @@
             <img src="assets/ball-little.png"/>
             <span>RLTrader</span>
         </header>
-        <br /><br /><br /><br /><br />
-        <div align="center">
-            <button onclick="addItemWindow()">Add item to inventory</button>
-        </div>
     </body>
     <div align="center">
         <div id="additemwindow" style="visibility: hidden;">
@@ -69,11 +65,24 @@
                     <h2 id="type">Type: An error happened</h2><br />
                     <div class="ie-footer">
                         <h4>Price Right Now: <span id="price">An error happened</span></h4>
-                        <div class="additembutton">ADD ITEM TO INVENTORY</div>
+                        <div class="additembutton" onclick="addItemToInventory()">ADD ITEM TO INVENTORY</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div id="alertbox"><i style="margin-right: 7px;" class="fas fa-info-circle"></i><span id="alertbox-span">An error happened</span></div>
+    <footer>
+        <span style="font-weight: bold; line-height: 3;" id="f-username">LIVEN</span>
+        <div class="separator"></div>
+        <span style="color: rgb(201, 201, 201); font-size: 23px; line-height: 3.5; margin-right: 293px;"><i>No item selected</i></span>
+        <span class="f-action"><i class="far fa-star"></i></i></span>
+        <span class="f-action"><i class="far fa-trash-alt"></i></span>
+        <span class="f-action"><i class="far fa-clone"></i></span>
+        <span class="f-action" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
+        <div class="separator"></div>
+        <span class="new-item" onclick="addItemWindow()">ADD NEW ITEM</span>
+        <div class="separator"></div>
+        <span class="f-white f-action"><i class="fas fa-chevron-down toolbar-toggler" onclick="toggleToolbar()"></i></span>
+    </footer>
+    <div class="alertbox"><i style="margin-right: 7px;" class="fas fa-info-circle"></i><span id="alertbox-span">An error happened</span></div>
 </html>

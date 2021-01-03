@@ -1,24 +1,42 @@
+const electron = require("electron");
+const fs = require("fs");
+
 function pageLoad() {
-    console.log("Loading userdata...")
+    const dataFolderPath = (electron.app || electron.remote.app).getPath('userData');
+     
+    if(fs.existsSync(dataFolderPath + "/data/")) {
+        var userDataPath = dataFolderPath + "/data/userdata.json";
 
-    var xmlContent = "";
-    fetch('data/userdata.xml').then((response) => {
-        response.text().then((xml) => {
-            xmlContent = xml;
+        if(fs.existsSync(userDataPath)) {
+            var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
-            var parser = new DOMParser();
-            var xmlDOM = parser.parseFromString(xmlContent, 'application/xml');
-
-            var didFirstConnnect = xmlDOM.getElementsByTagName('didFirstConnect')[0].textContent;
-            if(didFirstConnnect == "0") {
+            if(userDataContent.didFirstConnect != 1) {
                 document.getElementById('welcome-screen').style.display = "block";
             }
-        });
-    });
-    console.log("Userdata loaded.")
+        }
+        else {
+            console.log("File userdata.json not found, creating one..");
+
+            var initialContent = {"didFirstConnect":0};
+            fs.writeFileSync(userDataPath, JSON.stringify(initialContent, null, 4),'utf-8');
+            pageLoad();
+        }
+    } else {
+        console.log("Folder data not found, creating one..");
+        fs.mkdirSync(dataFolderPath + "/data/");
+        pageLoad();
+    }
 }
 
 window.onload = pageLoad;
+window.onload = function() {
+    document.getElementById("itemsearch").addEventListener("keyup", function(event) {
+        if (event.key == 'Enter') {
+            event.preventDefault();
+            $(".search").click();
+        }
+    });
+}
 
 function startConfig(type) {
     var online_btn = document.getElementById('online-btn');
@@ -61,18 +79,16 @@ function startConfig(type) {
                 question_teller.innerHTML = "Perfect, we got everything we need!";
             });
             $("#questionteller").animate({ opacity: 1 });
-            var xmlContent = "";
-            fetch('data/userdata.xml').then((response) => {
-                response.text().then((xml) => {
-                    xmlContent = xml;
 
-                    var parser = new DOMParser();
-                    var xmlDOM = parser.parseFromString(xmlContent, 'application/xml');
-                    console.log(xmlDOM.getElementsByTagName('didFirstConnect')[0].textContent);
-                    xmlDOM.getElementsByTagName('didFirstConnect')[0].textContent = "1";
-                    console.log(xmlDOM.getElementsByTagName('didFirstConnect')[0].textContent);
-                });
-            });
+            var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+            var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+
+            userDataContent.didFirstConnect = 1;
+            userDataContent.username = username_field.value;
+            userDataContent.inventory = [];
+            
+            fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+
             setTimeout(function () {
                 $("#welcome-screen").fadeOut("fast");
             }, 2000);
@@ -89,13 +105,39 @@ function addItemWindow() {
                 aiw.style.visibility = "hidden";
                 document.getElementById('colorpicker').style.visibility = "hidden";
                 document.getElementById('iteminfo').style.visibility = "hidden";
-            }, 500);
+                document.querySelector("footer").style.zIndex = 0;
+            }, 100);
         });
     } else { //hidden
+        document.querySelector("footer").style.zIndex = -1;
         aiw.style.visibility = "visible";
         aiw.style.opacity = 0;
         $("#additemwindow").animate({ opacity: 1 }, "fast");
         $(".aiw-container").animate({ top: "10px" }, "fast");
+    }
+}
+
+function toggleToolbar() {
+    var toolbar = document.querySelector("footer");
+    if(toolbar.style.bottom == "23px") { //will hide
+        $("footer").animate({ bottom: "-46px" });
+        $(".toolbar-toggler").animate({ top: "-20px" }, "fast");
+        $(".toolbar-toggler").animate({ opacity: 0 }, "fast", function() {
+            $(".toolbar-toggler").parent().html("<i class=\"fas fa-chevron-up toolbar-toggler\" onclick=\"toggleToolbar()\"></i>");
+            $(".toolbar-toggler").css("top", "-20px");
+        });
+        $(".toolbar-toggler").animate({ opacity: 1 }, "fast");
+
+        $("#f-username").animate({ top: "-54px" }, "fast");
+    } else { //will show
+        $("footer").animate({ bottom: "23px" });
+        $(".toolbar-toggler").animate({ top: "0px" }, "fast");
+        $(".toolbar-toggler").animate({ opacity: 0 }, "fast", function() {
+            $(".toolbar-toggler").parent().html("<i class=\"fas fa-chevron-down toolbar-toggler\" onclick=\"toggleToolbar()\"></i>");
+            $(".toolbar-toggler").css("top", "0px");
+        });
+        $(".toolbar-toggler").animate({ opacity: 1 }, "fast");
+        $("#f-username").animate({ top: "-34px" }, "fast");
     }
 }
 
@@ -128,30 +170,37 @@ async function selectColor(color) {
         case "white":
             colorbutton.innerHTML = "Titanium White";
             colorbutton.style.background = "#dbdbdb";
+            colorbutton.style.color = "white";
             break;
         case "grey":
             colorbutton.innerHTML = "Grey";
             colorbutton.style.background = "grey";
+            colorbutton.style.color = "white";
             break;
         case "crimson":
             colorbutton.innerHTML = "Crimson";
             colorbutton.style.background = "#de1b1b";
+            colorbutton.style.color = "white";
             break;
         case "pink":
             colorbutton.innerHTML = "Pink";
             colorbutton.style.background = "pink";
+            colorbutton.style.color = "white";
             break;
         case "cobalt":
             colorbutton.innerHTML = "Cobalt";
             colorbutton.style.background = "#1b5cde";
+            colorbutton.style.color = "white";
             break;
         case "sblue":
             colorbutton.innerHTML = "Sky Blue";
             colorbutton.style.background = "#09e9ed";
+            colorbutton.style.color = "white";
             break;
         case "sienna":
             colorbutton.innerHTML = "Burnt Sienna";
             colorbutton.style.background = "brown";
+            colorbutton.style.color = "white";
             break;
         case "saffron":
             colorbutton.innerHTML = "Saffron";
@@ -161,18 +210,22 @@ async function selectColor(color) {
         case "lime":
             colorbutton.innerHTML = "Lime";
             colorbutton.style.background = "#07eb12";
+            colorbutton.style.color = "white";
             break;
         case "fgreen":
             colorbutton.innerHTML = "Forest Green";
             colorbutton.style.background = "#0d7522";
+            colorbutton.style.color = "white";
             break;
         case "orange":
             colorbutton.innerHTML = "Orange";
             colorbutton.style.background = "orange";
+            colorbutton.style.color = "white";
             break;
         case "purple":
             colorbutton.innerHTML = "Purple";
             colorbutton.style.background = "purple";
+            colorbutton.style.color = "white";
             break;
         case "default":
             colorbutton.innerHTML = "Default";
@@ -189,10 +242,50 @@ async function selectColor(color) {
             colorpicker.style.visibility = "hidden";
         });
         if(color == "default") {
-            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML, "", "currentPriceRange") + " Cr";
+            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML.replace(" ", "_"), "", "currentPriceRange") + " Cr";
         } else {
-            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML, "/" + color, "currentPriceRange") + " Cr";
+            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML.replace(" ", "_"), "/" + color, "currentPriceRange") + " Cr";
         }
         
+    }
+}
+
+function addItemToInventory() {
+    var itemnameLabel = document.getElementById('item-name');
+    var colorbutton = document.getElementById('colorbutton');
+    var priceLabel = document.getElementById('price');
+
+    if(itemnameLabel.innerText != "An error happened") {
+        if(colorbutton.innerText != "Choose a color") {
+            var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+            var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+
+            var price;
+            if(priceLabel.innerText == "No price yet.") { price = "/" } else { price = priceLabel.innerText.replace(" Cr", "") }
+
+            userDataContent.inventory.push({"name":itemnameLabel.innerText,"color":colorbutton.innerText, "lastCreditPrice":price});
+            fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+            console.log("Added item :\"" + itemnameLabel.innerText + "\" to inventory.");
+
+            $(".aiw-container").animate({ top: "-50px" }, "fast");
+            $("#additemwindow").animate({ opacity: 0 }, "fast", function() {
+                setTimeout(function () {
+                    document.getElementById('additemwindow').style.visibility = "hidden";
+                    document.getElementById('colorpicker').style.visibility = "hidden";
+                    document.getElementById('iteminfo').style.visibility = "hidden";
+                }, 500);
+            });
+
+            document.getElementById('alertbox-span').innerHTML = "Item successfully added to your inventory";
+            $('.alertbox').css("background-color", "#2ecc71");
+            $('.alertbox').animate({ opacity: 1 }, "fast", function() {
+                setTimeout(function () {
+                    $('.alertbox').animate({ opacity: 0 }, "fast");
+                }, 5000);
+            });
+        }
+        else {
+            colorbutton.style.color = "red";
+        }
     }
 }

@@ -316,26 +316,82 @@ header span {
     background-color: white;
 }
 
-#alertbox {
+footer {
+    background-color: #a96da3;
+    position: fixed;
+    width: 96%;
+    height: 80px;
+    left: 2%;
+    bottom: 23px;
+    border-radius: 10px;
+    display: table;
+    z-index: 0;
+}
+
+footer span {
+    display: inline-block;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 26px;
+    color: white;
+    height: 100%;
+    text-align: center;
+    margin: 0px 25px;
+    position: relative;
+    top: -34px;
+}
+
+footer .new-item {
+    font-weight: lighter;
+    font-size: 20px;
+    line-height: 3.9;
+    top: -36;
+    cursor: pointer;
+    margin: 0;
+    padding: 0px 25px;
+    background-color: #a96da3;
+}
+
+footer .new-item:hover {
+    background-color: #7e5279;
+}
+
+footer .f-action {
+    margin: 0px 12px;
+}
+
+footer .f-white {
+    color: white !important;
+    margin: 0px 25px;
+    cursor: default !important;
+}
+
+footer .f-white i {
+    cursor: pointer;
+    position: relative;
+    top: 0px;
+}
+
+footer .f-action {
+    color: rgb(201, 201, 201);
+    cursor: pointer;
+}
+
+footer .separator {
+    display: inline-block;
+    width: 2px;
+    height: 80%;
+    background-color: white;
+    margin: 9px 0px;
+}
+
+.alertbox {
     padding: 7px 10px;
     font-weight: bold;
     background-color: #e74c3c;
     color: white;
     position: fixed;
     top: 75px;
-    left: -999px;
+    left: 10px;
     border-radius: 7px;
     opacity: 0;
-
-    animation: alertbox-pop 5s ease;
-    animation-play-state: paused;
-}
-
-@keyframes alertbox-pop {
-    0% { opacity: 0; }
-    1% { left: 15px; }
-    15% { opacity: 1; }
-    85% { opacity: 1; }
-    99% { opacity: 0; left: 15px; }
-    100% { left: -999px; }
 }

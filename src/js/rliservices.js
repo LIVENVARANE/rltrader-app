@@ -12,7 +12,6 @@ async function searchForItem() {
     var aiwLoadingWheel = document.getElementById('aiw-loading');
     var priceLabel = document.getElementById('price');
     var alertspan = document.getElementById('alertbox-span');
-    var alertbox = document.getElementById('alertbox');
 
     colorpicker.style.visibility = "hidden";
     iteminfo.style.visibility = "hidden";
@@ -219,6 +218,7 @@ async function searchForItem() {
             }
 
             var price = await doItemRequest(itemsearch, itemcolor, "currentPriceRange") + " Cr"; //will set the price for the color the user has specified
+            if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
         }
         else {
             if(availableColors == " Default") { //the does not have any colors available (only default)
@@ -226,6 +226,7 @@ async function searchForItem() {
                 colorbutton.style.background = "#313131";
                 colorbutton.style.color = "white";
                 var price = await doItemRequest(itemsearch, "", "currentPriceRange") + " Cr"; //getting the price for the default color
+                if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
             } else {
                 colorbutton.innerHTML = "Choose a color";
                 colorbutton.style.background = "linear-gradient(to right, #4776E6, #8e54e9)";
@@ -233,7 +234,11 @@ async function searchForItem() {
                 var price = "Please select a color";
                 if(itemcolor != "") { //the user specified a color but it does not exists
                     alertspan.innerHTML = "The color you specified does not exists for this item.";
-                    alertbox.style.animationPlayState = "running";
+                    $('.alertbox').animate({ opacity: 1 }, "fast", function() {
+                        setTimeout(function () {
+                            $('.alertbox').animate({ opacity: 0 }, "fast");
+                        }, 5000);
+                    });
                 }
             }
         }
