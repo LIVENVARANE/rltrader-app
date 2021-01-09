@@ -10,8 +10,65 @@ function pageLoad() {
         if(fs.existsSync(userDataPath)) {
             var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
+            document.getElementById("itemsearch").addEventListener("keyup", function(event) {
+                if (event.key == 'Enter') {
+                    event.preventDefault();
+                    $(".search").click();
+                }
+            });
+
             if(userDataContent.didFirstConnect != 1) {
                 document.getElementById('welcome-screen').style.display = "block";
+            }
+            else {
+                var invContainer = document.getElementById("inv-container");
+                userDataContent.inventory.forEach(item => {
+                    var itemDiv = document.createElement('div');
+                    itemDiv.className = "item";
+                    itemDiv.innerHTML = item.displayColor + " " + item.name;
+                    switch(item.color) {
+                        case "black":
+                            itemDiv.style.borderTop = "2px solid black";
+                            break;
+                        case "white":
+                            itemDiv.style.borderTop = "2px solid #dbdbdb";
+                            break;
+                        case "grey":
+                            itemDiv.style.borderTop = "2px solid grey";
+                            break;
+                        case "crimson":
+                            itemDiv.style.borderTop = "2px solid #de1b1b";
+                            break;
+                        case "pink":
+                            itemDiv.style.borderTop = "2px solid pink";
+                            break;
+                        case "cobalt":
+                            itemDiv.style.borderTop = "2px solid #1b5cde";
+                            break;
+                        case "sblue":
+                            itemDiv.style.borderTop = "2px solid #09e9ed";
+                            break;
+                        case "sienna":
+                            itemDiv.style.borderTop = "2px solid brown";
+                            break;
+                        case "saffron":
+                            itemDiv.style.borderTop = "2px solid yellow";
+                            break;
+                        case "lime":
+                            itemDiv.style.borderTop = "2px solid #07eb12";
+                            break;
+                        case "fgreen":
+                            itemDiv.style.borderTop = "2px solid #0d7522";
+                            break;
+                        case "orange":
+                            itemDiv.style.borderTop = "2px solid orange";
+                            break;
+                        case "purple":
+                            itemDiv.style.borderTop = "2px solid purple";
+                            break;
+                    }
+                    invContainer.appendChild(itemDiv);
+                });
             }
         }
         else {
@@ -29,14 +86,6 @@ function pageLoad() {
 }
 
 window.onload = pageLoad;
-window.onload = function() {
-    document.getElementById("itemsearch").addEventListener("keyup", function(event) {
-        if (event.key == 'Enter') {
-            event.preventDefault();
-            $(".search").click();
-        }
-    });
-}
 
 function startConfig(type) {
     var online_btn = document.getElementById('online-btn');
@@ -263,9 +312,55 @@ function addItemToInventory() {
             var price;
             if(priceLabel.innerText == "No price yet.") { price = "/" } else { price = priceLabel.innerText.replace(" Cr", "") }
 
-            userDataContent.inventory.push({"name":itemnameLabel.innerText,"color":colorbutton.innerText, "lastCreditPrice":price});
+            var color;
+            switch(colorbutton.innerText) {
+                case "Black":
+                    color = "black";
+                    break;
+                case "Titanium White":
+                    color = "white";
+                    break;
+                case "Grey":
+                    color = "grey";
+                    break;
+                case "Crimson":
+                    color = "crimson";
+                    break;
+                case "Pink":
+                    color = "pink";
+                    break;
+                case "Cobalt":
+                    color = "cabalt";
+                    break;
+                case "Sky Blue":
+                    color = "sblue";
+                    break;
+                case "Burnt Sienna":
+                    color = "sienna";
+                    break;
+                case "Saffron":
+                    color = "saffron";
+                    break;
+                case "Lime":
+                    color = "lime";
+                    break;
+                case "Forest Green":
+                    color = "fgreen";
+                    break;
+                case "Orange":
+                    ccolor = "orange";
+                    break;
+                case "Purple":
+                    color = "purple";
+                    break;
+                default:
+                    color = "";
+                    break;
+            }
+            userDataContent.inventory.push({"name":itemnameLabel.innerText, "color":color,"displayColor":colorbutton.innerText, "lastCreditPrice":price});
             fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
             console.log("Added item :\"" + itemnameLabel.innerText + "\" to inventory.");
+            pageLoad();
 
             $(".aiw-container").animate({ top: "-50px" }, "fast");
             $("#additemwindow").animate({ opacity: 0 }, "fast", function() {

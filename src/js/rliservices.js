@@ -19,6 +19,7 @@ async function searchForItem() {
 
     //determining what color the user specifies (if he specifies one)
     itemsearch = itemsearch.replaceAll(" ", "_");
+    itemsearch = itemsearch.replaceAll(":", "");
     if(itemsearch.includes('/')) {
         var itemcolor = itemsearch.substring(itemsearch.indexOf("/") + 1).toLowerCase();
         switch(itemcolor) {
@@ -126,17 +127,35 @@ async function searchForItem() {
         var stockAC_withDefault = stockAC; //before removing default
         if(stockAC == " default") {
             var itemname = await doItemRequest(itemsearch, "", "itemName"); //we take the first color that is available because we just want the name (the color will not change the item name)
-            var itemPicURL = await doItemRequest(itemsearch, "", true);
-            var rarity = await doItemRequest(itemsearch, "", true);
-            var type = await doItemRequest(itemsearch, "", true);
+            var blankRequest = await doItemRequest(itemsearch, "", true);
         } else {
             stockAC = stockAC.replace("default", "");
             var itemname = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], "itemName"); //we take the first color that is available because we just want the name (the color will not change the item name)
-            var itemPicURL = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
-            var rarity = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
-            var type = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+            var blankRequest = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
         }
 
+        if(itemcolor.replace("/", "")) {
+            var itemPicURL = await doItemRequest(itemsearch, itemcolor, true);
+        } else if(stockAC_withDefault.includes("default")) {
+            var itemPicURL = await doItemRequest(itemsearch, "", true);
+        }
+        else {
+            var itemPicURL = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+        }
+        
+
+        var rarity = blankRequest;
+        var type = blankRequest;
+        var specialEditionName = blankRequest.substring(blankRequest.indexOf("<title>") + 7);
+        specialEditionName = specialEditionName.substring(0, specialEditionName.indexOf("</title>"));
+        if(specialEditionName.includes(": ")) {
+            specialEditionName = specialEditionName.substring(specialEditionName.indexOf(": ") + 2);
+            specialEditionName = specialEditionName.substring(0, specialEditionName.indexOf(" on "));
+            specialEditionName = " : " + specialEditionName;
+        } else {
+            specialEditionName = "";
+        }
+        
         rarity = rarity.substring(rarity.indexOf("<td>Rarity</td><td>") + 19);
         rarity = rarity.substring(0, rarity.indexOf('</td></tr><tr><td>Type</td>'));
         type = type.substring(type.indexOf("<td>Type</td><td>") + 17)
@@ -150,7 +169,7 @@ async function searchForItem() {
         iteminfo.style.opacity = 0;
         $("#iteminfo").animate({ opacity: 1 }, "fast");
         itemimage.src = itemPicURL;
-        itemnameLabel.innerHTML = itemname;
+        itemnameLabel.innerHTML = itemname + specialEditionName;
         rarityLabel.innerHTML = "Rarity: " + rarity;
         typeLabel.innerHTML = "Type: " + type;
         document.getElementById('itemsearch').value = "";
