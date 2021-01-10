@@ -389,13 +389,23 @@ footer .separator {
 }
 
 #inv-container .item {
-    width: 200px;
+    width: 220px;
     height: 100px;
     background-color: rgb(238, 238, 238);
     border-radius: 15px;
-    padding: 10px 15px;
+    padding: 10px 10px;
     margin: 15px;
-    display: inline-grid;
+    display: inline-flex;
+}
+
+#inv-container .item .itemimage {
+    width: 100px;
+    border-radius: 15px;
+}
+
+#inv-container .item .itemName {
+    margin-left: 10px;
+    font-weight: bold;
 }
 
 .alertbox {

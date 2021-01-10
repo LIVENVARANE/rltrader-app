@@ -134,15 +134,17 @@ async function searchForItem() {
             var blankRequest = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
         }
 
-        if(itemcolor.replace("/", "")) {
+        if(itemcolor == "") {
+            if(stockAC_withDefault.includes("default")) {
+                var itemPicURL = await doItemRequest(itemsearch, "", true);
+            } else {
+                var itemPicURL = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+            }
+        } else if(stockAC.includes(itemcolor.replace("/", ""))) {
             var itemPicURL = await doItemRequest(itemsearch, itemcolor, true);
-        } else if(stockAC_withDefault.includes("default")) {
-            var itemPicURL = await doItemRequest(itemsearch, "", true);
-        }
-        else {
+        } else {
             var itemPicURL = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
-        }
-        
+        }    
 
         var rarity = blankRequest;
         var type = blankRequest;

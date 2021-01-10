@@ -22,56 +22,26 @@ function pageLoad() {
             }
             else {
                 var invContainer = document.getElementById("inv-container");
+                invContainer.innerHTML = "";
                 userDataContent.inventory.forEach(item => {
                     var itemDiv = document.createElement('div');
                     itemDiv.className = "item";
-                    itemDiv.innerHTML = item.displayColor + " " + item.name;
-                    switch(item.color) {
-                        case "black":
-                            itemDiv.style.borderTop = "2px solid black";
-                            break;
-                        case "white":
-                            itemDiv.style.borderTop = "2px solid #dbdbdb";
-                            break;
-                        case "grey":
-                            itemDiv.style.borderTop = "2px solid grey";
-                            break;
-                        case "crimson":
-                            itemDiv.style.borderTop = "2px solid #de1b1b";
-                            break;
-                        case "pink":
-                            itemDiv.style.borderTop = "2px solid pink";
-                            break;
-                        case "cobalt":
-                            itemDiv.style.borderTop = "2px solid #1b5cde";
-                            break;
-                        case "sblue":
-                            itemDiv.style.borderTop = "2px solid #09e9ed";
-                            break;
-                        case "sienna":
-                            itemDiv.style.borderTop = "2px solid brown";
-                            break;
-                        case "saffron":
-                            itemDiv.style.borderTop = "2px solid yellow";
-                            break;
-                        case "lime":
-                            itemDiv.style.borderTop = "2px solid #07eb12";
-                            break;
-                        case "fgreen":
-                            itemDiv.style.borderTop = "2px solid #0d7522";
-                            break;
-                        case "orange":
-                            itemDiv.style.borderTop = "2px solid orange";
-                            break;
-                        case "purple":
-                            itemDiv.style.borderTop = "2px solid purple";
-                            break;
-                    }
+                    itemDiv.style.borderTop = "2px solid " + item.cssColor;
+                    itemDiv.align = "left";
                     invContainer.appendChild(itemDiv);
+
+                    var itemImage = document.createElement('img');
+                    itemImage.src = item.itemImage;
+                    itemImage.className = "itemimage";
+                    itemDiv.appendChild(itemImage);
+
+                    var itemName = document.createElement('span');
+                    itemName.innerHTML = item.name;
+                    itemName.className = "itemname";
+                    itemDiv.appendChild(itemName);
                 });
             }
-        }
-        else {
+        } else {
             console.log("File userdata.json not found, creating one..");
 
             var initialContent = {"didFirstConnect":0};
@@ -111,8 +81,7 @@ function startConfig(type) {
         username_field.focus();
         offline_btn.removeAttribute('onclick');
         offline_btn.setAttribute('onclick', 'startConfig("o-continue");');
-    }
-    else if(type == "o-continue") {
+    } else if(type == "o-continue") {
         if(username_field.value == "") {
             $("#questionteller").animate({ opacity: 0 }, function() {
                 question_teller.innerHTML = "Please enter a valid username.";
@@ -163,6 +132,7 @@ function addItemWindow() {
         aiw.style.opacity = 0;
         $("#additemwindow").animate({ opacity: 1 }, "fast");
         $(".aiw-container").animate({ top: "10px" }, "fast");
+        document.getElementById('itemsearch').focus();
     }
 }
 
@@ -208,7 +178,12 @@ async function selectColor(color) {
     var priceLabel = document.getElementById('price');
     var colorpicker = document.getElementById('colorpicker');
     var itemnameLabel = document.getElementById('item-name');
+    var itemImage = document.getElementById('itemimage');
     var stop = false;
+
+    var itemImageURL = await doItemRequest(itemnameLabel.innerText.replace(" : ", "_").replace(" ", "_"), "/" + color.replace("default", ""), true);
+    itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
+    itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
 
     switch(color) {
         case "black":
@@ -286,6 +261,7 @@ async function selectColor(color) {
             stop = true;
             break;
     }
+
     if(!stop) {
         $("#colorpicker").animate({ opacity: 0 }, "fast", function() {
             colorpicker.style.visibility = "hidden";
@@ -348,7 +324,7 @@ function addItemToInventory() {
                     color = "fgreen";
                     break;
                 case "Orange":
-                    ccolor = "orange";
+                    color = "orange";
                     break;
                 case "Purple":
                     color = "purple";
@@ -357,7 +333,7 @@ function addItemToInventory() {
                     color = "";
                     break;
             }
-            userDataContent.inventory.push({"name":itemnameLabel.innerText, "color":color,"displayColor":colorbutton.innerText, "lastCreditPrice":price});
+            userDataContent.inventory.push({"name":itemnameLabel.innerText, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
             fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
             console.log("Added item :\"" + itemnameLabel.innerText + "\" to inventory.");
             pageLoad();
