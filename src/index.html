@@ -27,6 +27,7 @@
         <header>
             <img src="assets/ball-little.png"/>
             <span>RLTrader</span>
+            <i class="fas fa-cog" onclick="settingsWindow()"></i>
         </header>
         <div align="center">
             <div id="inv-container"></div>
@@ -69,6 +70,29 @@
                     <div class="ie-footer">
                         <h4>Price Right Now: <span id="price">An error happened</span></h4>
                         <div class="additembutton" onclick="addItemToInventory()">ADD ITEM TO INVENTORY</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="settingswindow">
+            <div id="settings-page"><i class="fas fa-times close" onclick="settingsWindow()"></i>
+                <div class="navbar">
+                    <h2>Settings</h2>
+                    <span><a><i class="fas fa-cogs"></i> General</a></span>
+                    <span><a><i class="fas fa-user-circle"></i> Account</a></span>
+                    <span><a><i class="fas fa-home"></i> Dashboard</a></span>
+                    <span><a><i class="fas fa-toolbox"></i> Toolbar</a></span>
+                    <span><a><i class="fas fa-star"></i> Credits</a></span>
+                </div>
+                <div class="content">
+                    <div id="s-general">
+                        <h2>General</h2>
+                        <br /><br />
+                        <h3>Language: 
+                            <select>
+                                <option value="eng">English</option>
+                            </select>
+                        </h3>
                     </div>
                 </div>
             </div>

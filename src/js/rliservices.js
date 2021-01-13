@@ -273,7 +273,7 @@ async function searchForItem() {
         });
     }
 }
-                                                        //IF SPECIFIER = TRUE => WILL RETURN RAW RESPONSE
+                                                 //IF SPECIFIER = TRUE => WILL RETURN RAW RESPONSE
 function doItemRequest(item, color, specifier) { //item found, will output color name (default if no color specified), item not found, will output no AND if specifier is defined, will output the specifier for the item
     return new Promise(resolve => {
         const http = new XMLHttpRequest();

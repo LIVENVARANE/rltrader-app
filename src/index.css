@@ -9,7 +9,7 @@ html, body {
 
 header {
     background-color: #3B3B58;
-    height: 60;
+    height: 60px;
     padding: 0px 20px 0px 20px;
     cursor: default;
 }
@@ -29,13 +29,117 @@ header span {
     margin-left: 7px;
 }
 
+header i {
+    text-align: right;
+    color: white;
+    font-size: 23px;
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    cursor: pointer;
+}
+
+#settingswindow {
+    visibility: hidden;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(66, 66, 66, 0.3);
+}
+
+#settingswindow #settings-page {
+    background-color: white;
+    border-radius: 10px;
+    width: 560px;
+    height: 540px;
+    padding: 10px;
+    cursor: default;
+    border-bottom: 3px solid grey;
+    position: relative;
+    top: 66px;
+}
+
+#settingswindow #settings-page .close {
+    position: absolute;
+    color: #7A5980;
+    right: 15px;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+#settingswindow #settings-page .navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 10px 10px 10px 7px;
+    background-color: #BC7C9C;
+    height: 100%;
+    width: 30%;
+    color: white;
+}
+
+#settingswindow #settings-page .navbar h2 {
+    font-weight: bold;
+    margin: 40px 0px;
+}
+
+#settingswindow #settings-page .navbar span {
+    display: block;
+    width: 100%;
+    border-top: 1px solid #ffffff54;
+    padding: 10px 0px;
+    cursor: pointer;
+    color: #efefef;
+    font-weight: bold;
+}
+
+#settingswindow #settings-page .navbar span a {
+    position: relative;
+    left: 0px;
+
+    transition: 0.1s ease-out left;
+}
+
+#settingswindow #settings-page .navbar span:hover > a {
+    left: 3px;
+}
+
+#settingswindow #settings-page .content {
+    position: absolute;
+    width: 70%;
+    height: calc(100% - 20px);
+    right: 0px;
+    top: 0px;
+    padding-top: 20;
+}
+
+#settingswindow #settings-page .content h2 {
+    color: #3B3B58;
+    text-align: left;
+    margin-left: 10%;
+}
+
+#settingswindow #settings-page .content h3 {
+    font-weight: normal;
+    text-align: left;
+    margin: 10px 0px 10px 13%;
+}
+
+#settingswindow #settings-page .content select {
+    outline: none;
+    padding: 3px 20px 3px 5px;
+    border-radius: 10px;
+}
+
 #additemwindow {
     visibility: hidden;
     position: fixed;
-    top: 0;
+    top: 0px;
     width: 100%;
     height: 100%;
-    background-color: rgba(66, 66, 66, 0.3);;
+    background-color: rgba(66, 66, 66, 0.3);
 }
 
 #additemwindow .aiw-container {
@@ -127,7 +231,7 @@ header span {
     background-color: white;
     border-radius: 10px;
     width: 560px;
-    height: 440;
+    height: 440px;
     padding: 10px;
     cursor: default;
     border-bottom: 3px solid grey;

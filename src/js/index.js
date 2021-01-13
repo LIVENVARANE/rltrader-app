@@ -136,6 +136,23 @@ function addItemWindow() {
     }
 }
 
+function settingsWindow() {
+    var sw = document.getElementById('settingswindow');
+    if(sw.style.visibility == "visible") {
+        $("#settingswindow").animate({ opacity: 0 }, "fast", function() {
+            setTimeout(function () {
+                sw.style.visibility = "hidden";
+                document.querySelector("footer").style.zIndex = 0;
+            }, 100);
+        });
+    } else { //hidden
+        document.querySelector("footer").style.zIndex = -1;
+        sw.style.visibility = "visible";
+        sw.style.opacity = 0;
+        $("#settingswindow").animate({ opacity: 1 }, "fast");
+    }
+}
+
 function toggleToolbar() {
     var toolbar = document.querySelector("footer");
     if(toolbar.style.bottom == "23px") { //will hide
