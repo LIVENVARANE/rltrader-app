@@ -507,8 +507,32 @@ footer .separator {
     border-radius: 15px;
 }
 
-#inv-container .item .itemName {
+#inv-container .item .info {
     margin-left: 10px;
+    width: 120px;
+    display: block;
+    position: relative;
+}
+
+#inv-container .item .info .itemname {
+    font-weight: bold;
+    height: fit-content;
+}
+
+#inv-container .item .info .itemcolor {
+    color: white;
+    background-color: rgb(49, 49, 49);
+    padding: 5 10;
+    height: fit-content;
+    border-radius: 5px;
+    margin-top: 7px;
+    display: block;
+    text-align: center;
+}
+
+#inv-container .item .info .itemprice {
+    position: absolute;
+    bottom: 0px;
     font-weight: bold;
 }
 

@@ -30,6 +30,9 @@ function pageLoad() {
                     itemDiv.align = "left";
                     invContainer.appendChild(itemDiv);
 
+                    var infoDiv = document.createElement('div');
+                    infoDiv.className = "info";
+
                     var itemImage = document.createElement('img');
                     itemImage.src = item.itemImage;
                     itemImage.className = "itemimage";
@@ -38,7 +41,25 @@ function pageLoad() {
                     var itemName = document.createElement('span');
                     itemName.innerHTML = item.name;
                     itemName.className = "itemname";
-                    itemDiv.appendChild(itemName);
+                    infoDiv.appendChild(itemName);
+
+                    var itemColor = document.createElement('span');
+                    itemColor.innerHTML = item.displayColor;
+                    itemColor.className = "itemcolor";
+                    itemColor.style.backgroundColor = item.cssColor;
+                    if(item.color == "white") {
+                        itemColor.style.color = "black";
+                    }
+                    infoDiv.appendChild(itemColor);
+
+                    var itemPrice = document.createElement('span');
+                    itemPrice.innerHTML = "Loading...";
+                    itemPrice.className = "itemprice";
+                    infoDiv.appendChild(itemPrice)
+
+                    itemDiv.appendChild(infoDiv);
+
+                    setPriceForItemBubble(item.name, item.color, item.lastCreditPrice, itemPrice);
                 });
             }
         } else {
@@ -56,6 +77,36 @@ function pageLoad() {
 }
 
 window.onload = pageLoad;
+
+async function setPriceForItemBubble(name, color, oldPrice, priceSpan) {
+    var reqName = name.replace(" :", "");
+    reqName = reqName.replace(" ", "_");
+    if(color == "") {
+        var reqColor = "";
+    } else {
+        var reqColor = "/" + color;
+    }
+    var price = await doItemRequest(reqName, reqColor, "currentPriceRange") + " Cr";
+    if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
+    priceSpan.innerHTML = price;
+
+    if(oldPrice.includes(' - ')) {
+        oldPrice = oldPrice.replace(" - ", ":");
+        oldPrice.split(':');
+        oldPrice = oldPrice[0] + oldPrice[1];
+        if(price.includes(' - ')) {
+            price = price.replace(" - ", ":");
+            price.split(':');
+            price = price[0] + price[1];
+            if(price > oldPrice) {
+                priceSpan.style.color = "green";
+            }
+            else if(price < oldPrice) {
+                priceSpan.style.color = "red";
+            }
+        }
+    }
+}
 
 function startConfig(type) {
     var online_btn = document.getElementById('online-btn');
@@ -284,9 +335,9 @@ async function selectColor(color) {
             colorpicker.style.visibility = "hidden";
         });
         if(color == "default") {
-            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML.replace(" ", "_"), "", "currentPriceRange") + " Cr";
+            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML.replace(" ", "_").replace(": ", ""), "", "currentPriceRange") + " Cr";
         } else {
-            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML.replace(" ", "_"), "/" + color, "currentPriceRange") + " Cr";
+            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML.replace(" ", "_").replace(": ", ""), "/" + color, "currentPriceRange") + " Cr";
         }
         
     }
@@ -299,80 +350,83 @@ function addItemToInventory() {
 
     if(itemnameLabel.innerText != "An error happened") {
         if(colorbutton.innerText != "Choose a color") {
-            var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
-            var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+            if(priceLabel.innerText != "Please select a color") {
+                var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+                var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
-            var price;
-            if(priceLabel.innerText == "No price yet.") { price = "/" } else { price = priceLabel.innerText.replace(" Cr", "") }
+                var price;
+                if(priceLabel.innerText == "No price yet.") { price = "/" } else { price = priceLabel.innerText.replace(" Cr", "") }
 
-            var color;
-            switch(colorbutton.innerText) {
-                case "Black":
-                    color = "black";
-                    break;
-                case "Titanium White":
-                    color = "white";
-                    break;
-                case "Grey":
-                    color = "grey";
-                    break;
-                case "Crimson":
-                    color = "crimson";
-                    break;
-                case "Pink":
-                    color = "pink";
-                    break;
-                case "Cobalt":
-                    color = "cabalt";
-                    break;
-                case "Sky Blue":
-                    color = "sblue";
-                    break;
-                case "Burnt Sienna":
-                    color = "sienna";
-                    break;
-                case "Saffron":
-                    color = "saffron";
-                    break;
-                case "Lime":
-                    color = "lime";
-                    break;
-                case "Forest Green":
-                    color = "fgreen";
-                    break;
-                case "Orange":
-                    color = "orange";
-                    break;
-                case "Purple":
-                    color = "purple";
-                    break;
-                default:
-                    color = "";
-                    break;
+                var color;
+                switch(colorbutton.innerText) {
+                    case "Black":
+                        color = "black";
+                        break;
+                    case "Titanium White":
+                        color = "white";
+                        break;
+                    case "Grey":
+                        color = "grey";
+                        break;
+                    case "Crimson":
+                        color = "crimson";
+                        break;
+                    case "Pink":
+                        color = "pink";
+                        break;
+                    case "Cobalt":
+                        color = "cabalt";
+                        break;
+                    case "Sky Blue":
+                        color = "sblue";
+                        break;
+                    case "Burnt Sienna":
+                        color = "sienna";
+                        break;
+                    case "Saffron":
+                        color = "saffron";
+                        break;
+                    case "Lime":
+                        color = "lime";
+                        break;
+                    case "Forest Green":
+                        color = "fgreen";
+                        break;
+                    case "Orange":
+                        color = "orange";
+                        break;
+                    case "Purple":
+                        color = "purple";
+                        break;
+                    default:
+                        color = "";
+                        break;
+                }
+                userDataContent.inventory.push({"name":itemnameLabel.innerText, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
+                fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+                console.log("Added item :\"" + itemnameLabel.innerText + "\" to inventory.");
+                pageLoad();
+
+                $(".aiw-container").animate({ top: "-50px" }, "fast");
+                $("#additemwindow").animate({ opacity: 0 }, "fast", function() {
+                    setTimeout(function () {
+                        document.getElementById('additemwindow').style.visibility = "hidden";
+                        document.getElementById('colorpicker').style.visibility = "hidden";
+                        document.getElementById('iteminfo').style.visibility = "hidden";
+                    }, 500);
+                });
+
+                document.getElementById('alertbox-span').innerHTML = "Item successfully added to your inventory";
+                $('.alertbox').css("background-color", "#2ecc71");
+                $('.alertbox').animate({ opacity: 1 }, "fast", function() {
+                    setTimeout(function () {
+                        $('.alertbox').animate({ opacity: 0 }, "fast");
+                    }, 5000);
+                });
+            } else {
+                alert("An error happened, please contact an administrator. Error code: NFPAI");
             }
-            userDataContent.inventory.push({"name":itemnameLabel.innerText, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
-            fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
-            console.log("Added item :\"" + itemnameLabel.innerText + "\" to inventory.");
-            pageLoad();
-
-            $(".aiw-container").animate({ top: "-50px" }, "fast");
-            $("#additemwindow").animate({ opacity: 0 }, "fast", function() {
-                setTimeout(function () {
-                    document.getElementById('additemwindow').style.visibility = "hidden";
-                    document.getElementById('colorpicker').style.visibility = "hidden";
-                    document.getElementById('iteminfo').style.visibility = "hidden";
-                }, 500);
-            });
-
-            document.getElementById('alertbox-span').innerHTML = "Item successfully added to your inventory";
-            $('.alertbox').css("background-color", "#2ecc71");
-            $('.alertbox').animate({ opacity: 1 }, "fast", function() {
-                setTimeout(function () {
-                    $('.alertbox').animate({ opacity: 0 }, "fast");
-                }, 5000);
-            });
-        }
-        else {
+        } else {
             colorbutton.style.color = "red";
         }
     }
