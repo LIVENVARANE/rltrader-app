@@ -23,11 +23,14 @@ function pageLoad() {
             else {
                 var invContainer = document.getElementById("inv-container");
                 invContainer.innerHTML = "";
+                var i = 0;
                 userDataContent.inventory.forEach(item => {
                     var itemDiv = document.createElement('div');
                     itemDiv.className = "item";
                     itemDiv.style.borderTop = "2px solid " + item.cssColor;
                     itemDiv.align = "left";
+                    itemDiv.id = "db-item" + i;
+                    itemDiv.setAttribute("onclick", "selectItem(" + i + ")")
                     invContainer.appendChild(itemDiv);
 
                     var infoDiv = document.createElement('div');
@@ -36,6 +39,7 @@ function pageLoad() {
                     var itemImage = document.createElement('img');
                     itemImage.src = item.itemImage;
                     itemImage.className = "itemimage";
+                    itemImage.setAttribute("draggable", "false")
                     itemDiv.appendChild(itemImage);
 
                     var itemName = document.createElement('span');
@@ -59,8 +63,17 @@ function pageLoad() {
 
                     itemDiv.appendChild(infoDiv);
 
+                    var selectContainer = document.createElement('div');
+                    selectContainer.innerHTML = '<i class="far fa-square"></i>';
+                    selectContainer.className = "selectcontainer";
+                    selectContainer.id = "db-item-cb" + i;
+                    itemDiv.appendChild(selectContainer);
+
                     setPriceForItemBubble(item.name, item.color, item.lastCreditPrice, itemPrice);
+                
+                    i++;
                 });
+                $("#inv-container").append("<br /><br /><br /><br />");
             }
         } else {
             console.log("File userdata.json not found, creating one..");
@@ -77,6 +90,46 @@ function pageLoad() {
 }
 
 window.onload = pageLoad;
+
+var selectedItems = 0;
+
+function selectItem(id) {
+    var item = document.getElementById("db-item" + id);
+    var itemCheckbox = document.getElementById("db-item-cb" + id);
+    var selectedTitle = document.getElementById("selectedtitle");
+    var actionsContainer = document.getElementById("actions-container");
+
+    if(itemCheckbox.innerHTML == '<i class="far fa-check-square"></i>') { //selected
+        itemCheckbox.innerHTML = '<i class="far fa-square"></i>';
+        itemCheckbox.style.opacity = 0;
+        selectedItems--;
+        if(selectedItems == 0) {
+            selectedTitle.innerHTML = "<i>No item selected</i>";
+            selectedTitle.style.color = "rgb(201, 201, 201)";
+            actionsContainer.setAttribute("style", "color: rgb(201, 201, 201) !important");
+        }
+        else if(selectedItems == 1) { 
+            selectedTitle.innerHTML = selectedItems + " item selected";
+            actionsContainer.setAttribute("style", "color: white !important");
+        }
+        else {
+            selectedTitle.innerHTML = selectedItems + " items selected";
+            actionsContainer.setAttribute("style", "color: white !important");
+        }
+    } else {
+        itemCheckbox.innerHTML = '<i class="far fa-check-square"></i>';
+        itemCheckbox.style.opacity = 1;
+        selectedItems++;
+        selectedTitle.style.color = "white";
+        actionsContainer.setAttribute("style", "color: white !important");
+        if(selectedItems == 1) {
+            selectedTitle.innerHTML = selectedItems + " item selected";
+        }
+        else {
+            selectedTitle.innerHTML = selectedItems + " items selected";
+        }
+    }
+}
 
 async function setPriceForItemBubble(name, color, oldPrice, priceSpan) {
     var reqName = name.replace(" :", "");
@@ -413,6 +466,7 @@ function addItemToInventory() {
                         document.getElementById('additemwindow').style.visibility = "hidden";
                         document.getElementById('colorpicker').style.visibility = "hidden";
                         document.getElementById('iteminfo').style.visibility = "hidden";
+                        document.querySelector("footer").style.zIndex = 0;
                     }, 500);
                 });
 

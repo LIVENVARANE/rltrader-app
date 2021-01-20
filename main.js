@@ -11,7 +11,6 @@ function createWindow () {
       }
     })
   
-    
     win.loadFile('src/index.html')
   }
   

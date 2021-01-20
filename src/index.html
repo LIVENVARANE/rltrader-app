@@ -30,7 +30,10 @@
             <i class="fas fa-cog" onclick="settingsWindow()"></i>
         </header>
         <div align="center">
-            <div id="inv-container"></div>
+            <div id="inv-container">
+                
+            </div>
+            <div class="bottom-gradient"></div>
         </div>
     </body>
     <div align="center">
@@ -101,11 +104,13 @@
     <footer>
         <span style="font-weight: bold; line-height: 3;" id="f-username">LIVEN</span>
         <div class="separator"></div>
-        <span style="color: rgb(201, 201, 201); font-size: 23px; line-height: 3.5; margin-right: 293px;"><i>No item selected</i></span>
-        <span class="f-action"><i class="far fa-star"></i></i></span>
-        <span class="f-action"><i class="far fa-trash-alt"></i></span>
-        <span class="f-action"><i class="far fa-clone"></i></span>
-        <span class="f-action" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
+        <span id="selectedtitle"><i>No item selected</i></span>
+        <div id="actions-container">
+            <span class="f-action"><i class="far fa-star"></i></i></span>
+            <span class="f-action"><i class="far fa-trash-alt"></i></span>
+            <span class="f-action"><i class="far fa-clone"></i></span>
+            <span class="f-action" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
+        </div>
         <div class="separator"></div>
         <span class="new-item" onclick="addItemWindow()">ADD NEW ITEM</span>
         <div class="separator"></div>

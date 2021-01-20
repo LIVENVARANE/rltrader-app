@@ -1,10 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 
+* {
+    pointer-events: auto;
+}
+
 html, body {
     margin: 0;
     padding: 0;
     font-family: 'Ubuntu', sans-serif;
     user-select: none;
+    pointer-events: none !important;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #c2c2c2;
 }
 
 header {
@@ -459,8 +481,28 @@ footer .new-item:hover {
     background-color: #7e5279;
 }
 
-footer .f-action {
+footer #selectedtitle {
+    color: rgb(201, 201, 201);
+    font-size: 23px;
+    line-height: 3.5;
+    margin-right: 253px;
+    width: 206px;
+    white-space: nowrap;
+
+    transition: 0.2s ease-in;
+}
+
+footer #actions-container {
+    color: rgb(201, 201, 201) !important;
+    display: contents;
+
+    transition: 0.2s ease-in;
+}
+
+footer #actions-container .f-action {
     margin: 0px 12px;
+    cursor: pointer;
+    color: unset;
 }
 
 footer .f-white {
@@ -475,11 +517,6 @@ footer .f-white i {
     top: 0px;
 }
 
-footer .f-action {
-    color: rgb(201, 201, 201);
-    cursor: pointer;
-}
-
 footer .separator {
     display: inline-block;
     width: 2px;
@@ -489,7 +526,23 @@ footer .separator {
 }
 
 #inv-container {
-    padding: 30px;
+    padding: 30px 20px 53px 20px;
+    position: absolute;
+    bottom: 0px;
+    z-index: -3;
+    height: 608px;
+    overflow-y: auto;
+}
+
+.bottom-gradient {
+    z-index: -2;
+    width: 100%;
+    height: 130px;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 54%, rgba(255,255,255,1) 100%);
 }
 
 #inv-container .item {
@@ -500,6 +553,26 @@ footer .separator {
     padding: 10px 10px;
     margin: 15px;
     display: inline-flex;
+    cursor: pointer;
+}
+
+#inv-container .item:hover > .selectcontainer {
+    opacity: 1;
+}
+
+#inv-container .item .selectcontainer {
+    position: absolute;
+    opacity: 0;
+
+    transition: 0.2s ease-in opacity;
+}
+
+#inv-container .item .selectcontainer i {
+    position: relative;
+    color: white;
+    font-size: 23px;
+    top: 70px;
+    left: 9px;
 }
 
 #inv-container .item .itemimage {
