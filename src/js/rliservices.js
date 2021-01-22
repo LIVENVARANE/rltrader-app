@@ -118,6 +118,8 @@ async function searchForItem() {
     availableColors = availableColors + " " + await doItemRequest(itemsearch, "/purple");
     availableColors = availableColors + " " + await doItemRequest(itemsearch, "");
     availableColors = availableColors.replaceAll(" no", ""); //we get all the colors that exists for that item
+    
+    console.log("Available colors: ", availableColors);
 
     if(availableColors == "") {
         alert("This item does not exist or it is not tradeable, make sure you typed the name correctly.");
@@ -134,6 +136,15 @@ async function searchForItem() {
             var blankRequest = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
         }
 
+        var decalCar = blankRequest.substring(blankRequest.indexOf("<title>") + 7);
+        decalCar = decalCar.substring(0, decalCar.indexOf("</title>"));
+        if(decalCar.includes("[")) {
+            decalCar = decalCar.substring(decalCar.indexOf("[") + 1);
+            decalCar = decalCar.substring(0, decalCar.indexOf("]")) + ": ";
+        } else {
+            decalCar = "";
+        }
+
         if(itemcolor == "") {
             if(stockAC_withDefault.includes("default")) {
                 var itemPicURL = await doItemRequest(itemsearch, "", true);
@@ -144,7 +155,7 @@ async function searchForItem() {
             var itemPicURL = await doItemRequest(itemsearch, itemcolor, true);
         } else {
             var itemPicURL = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
-        }    
+        }
 
         var rarity = blankRequest;
         var type = blankRequest;
@@ -171,7 +182,7 @@ async function searchForItem() {
         iteminfo.style.opacity = 0;
         $("#iteminfo").animate({ opacity: 1 }, "fast");
         itemimage.src = itemPicURL;
-        itemnameLabel.innerHTML = itemname + specialEditionName;
+        itemnameLabel.innerHTML = decalCar + itemname + specialEditionName;
         rarityLabel.innerHTML = "Rarity: " + rarity;
         typeLabel.innerHTML = "Type: " + type;
         document.getElementById('itemsearch').value = "";
@@ -290,10 +301,7 @@ function doItemRequest(item, color, specifier) { //item found, will output color
                 if(specifier == true) {
                     resolve(resp);
                 } else {
-                    if(resp.includes("<title>PC Search | Rocket League Insider</title>")) { //this item with this color does not exists
-                        resolve("no");
-                    }
-                    else if(resp.includes("var itemData = {\"itemName\":\"")) { //this item with this color exists
+                    if(resp.includes("var itemData = {\"itemName\":\"")) { //this item with this color exists
                         if(specifier === undefined) {
                             if(color == "") { //no color were specified
                                 resolve("Default");
@@ -305,6 +313,8 @@ function doItemRequest(item, color, specifier) { //item found, will output color
                             resp = resp.substring(resp.lastIndexOf("\"" + specifier + "\":\"") + (4 + specifier.length));
                             resolve(resp.substring(0, resp.indexOf('"')));
                         }
+                    } else { //this item with this color does not exists
+                        resolve("no");
                     }
                 }
             }

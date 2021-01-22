@@ -30,9 +30,7 @@
             <i class="fas fa-cog" onclick="settingsWindow()"></i>
         </header>
         <div align="center">
-            <div id="inv-container">
-                
-            </div>
+            <div id="inv-container"></div>
             <div class="bottom-gradient"></div>
         </div>
     </body>
@@ -43,7 +41,7 @@
                 <input type="text" id="itemsearch" placeholder="Type here the item name.." />
                 <div onclick="searchForItem()" class="search"><i class="fas fa-search"></i></div>
             </div>
-            <img src="assets/loading.svg" id="aiw-loading" />
+            <img src="assets/loading.svg" draggable="false" id="aiw-loading" />
             <br />
             <div id="iteminfo">
                 <h1>Add this item ?</h2>
@@ -89,8 +87,8 @@
                 </div>
                 <div class="content">
                     <div id="s-general">
-                        <h2>General</h2>
-                        <br /><br />
+                        <h2>General settings</h2>
+                        <br />
                         <h3>Language: 
                             <select>
                                 <option value="eng">English</option>
@@ -105,12 +103,10 @@
         <span style="font-weight: bold; line-height: 3;" id="f-username">LIVEN</span>
         <div class="separator"></div>
         <span id="selectedtitle"><i>No item selected</i></span>
-        <div id="actions-container">
-            <span class="f-action"><i class="far fa-star"></i></i></span>
-            <span class="f-action"><i class="far fa-trash-alt"></i></span>
-            <span class="f-action"><i class="far fa-clone"></i></span>
-            <span class="f-action" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
-        </div>
+        <span class="f-action" id="actionFav"><i class="far fa-star"></i></i></span>
+        <span class="f-action" id="actionDel"><i class="far fa-trash-alt"></i></span>
+        <span class="f-action" id="actionDup"><i class="far fa-clone"></i></span>
+        <span class="f-action" id="actionEdi" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
         <div class="separator"></div>
         <span class="new-item" onclick="addItemWindow()">ADD NEW ITEM</span>
         <div class="separator"></div>

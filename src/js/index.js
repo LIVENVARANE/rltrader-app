@@ -23,7 +23,7 @@ function pageLoad() {
             else {
                 var invContainer = document.getElementById("inv-container");
                 invContainer.innerHTML = "";
-                var i = 0;
+                var i = 1; //starting with 1 to align with item ids in userdata.json
                 userDataContent.inventory.forEach(item => {
                     var itemDiv = document.createElement('div');
                     itemDiv.className = "item";
@@ -91,49 +91,96 @@ function pageLoad() {
 
 window.onload = pageLoad;
 
-var selectedItems = 0;
+var selectedItems = [];
+
+function doItemAction(type) {
+    if(selectedItems.length == 0) {
+        switch(type) {
+            case "fav":
+                
+                break;
+            case "del":
+                //when found array values in json for the items id, edit all the item ids after the removed item id to still be 1, 2, 3, 4, 5
+                break;
+            case "dup":
+                
+                break;
+            case "edi":
+                if(selectedItems.length == 1) { //can only edit one item at once
+
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
 
 function selectItem(id) {
     var item = document.getElementById("db-item" + id);
     var itemCheckbox = document.getElementById("db-item-cb" + id);
     var selectedTitle = document.getElementById("selectedtitle");
-    var actionsContainer = document.getElementById("actions-container");
+    var actionFav = document.getElementById("actionFav");
+    var actionDel = document.getElementById("actionDel");
+    var actionDup = document.getElementById("actionDup");
+    var actionEdi = document.getElementById("actionEdi");
 
     if(itemCheckbox.innerHTML == '<i class="far fa-check-square"></i>') { //selected
         itemCheckbox.innerHTML = '<i class="far fa-square"></i>';
         itemCheckbox.style.opacity = 0;
-        selectedItems--;
-        if(selectedItems == 0) {
+        selectedItems = selectedItems.filter(function(e) { return e !== id })
+        if(selectedItems.length == 0) {
             selectedTitle.innerHTML = "<i>No item selected</i>";
             selectedTitle.style.color = "rgb(201, 201, 201)";
-            actionsContainer.setAttribute("style", "color: rgb(201, 201, 201) !important");
+            actionFav.style.color = "rgb(201, 201, 201)";
+            actionDel.style.color = "rgb(201, 201, 201)";
+            actionDup.style.color = "rgb(201, 201, 201)";
+            actionEdi.style.color = "rgb(201, 201, 201)";
+            actionEdi.title = null;
         }
-        else if(selectedItems == 1) { 
-            selectedTitle.innerHTML = selectedItems + " item selected";
-            actionsContainer.setAttribute("style", "color: white !important");
+        else if(selectedItems.length == 1) { 
+            selectedTitle.innerHTML = selectedItems.length + " item selected";
+            actionFav.style.color = "white";
+            actionDel.style.color = "white";
+            actionDup.style.color = "white";
+            actionEdi.style.color = "white";
+            actionEdi.title = null;
         }
         else {
-            selectedTitle.innerHTML = selectedItems + " items selected";
-            actionsContainer.setAttribute("style", "color: white !important");
+            selectedTitle.innerHTML = selectedItems.length + " items selected";
+            actionFav.style.color = "white";
+            actionDel.style.color = "white";
+            actionDup.style.color = "white";
+            actionEdi.style.color = "rgb(201, 201, 201)";
+            actionEdi.title = "Cannot edit more than one item at once";
         }
     } else {
         itemCheckbox.innerHTML = '<i class="far fa-check-square"></i>';
         itemCheckbox.style.opacity = 1;
-        selectedItems++;
+        selectedItems.push(id);
         selectedTitle.style.color = "white";
-        actionsContainer.setAttribute("style", "color: white !important");
-        if(selectedItems == 1) {
-            selectedTitle.innerHTML = selectedItems + " item selected";
+        if(selectedItems.length == 1) {
+            selectedTitle.innerHTML = selectedItems.length + " item selected";
+            actionFav.style.color = "white";
+            actionDel.style.color = "white";
+            actionDup.style.color = "white";
+            actionEdi.style.color = "white";
+            actionEdi.title = null;
         }
         else {
-            selectedTitle.innerHTML = selectedItems + " items selected";
+            selectedTitle.innerHTML = selectedItems.length + " items selected";
+            actionFav.style.color = "white";
+            actionDel.style.color = "white";
+            actionDup.style.color = "white";
+            actionEdi.style.color = "rgb(201, 201, 201)";
+            actionEdi.title = "Cannot edit more than one item at once";
+
         }
     }
 }
 
 async function setPriceForItemBubble(name, color, oldPrice, priceSpan) {
-    var reqName = name.replace(" :", "");
-    reqName = reqName.replace(" ", "_");
+    var reqName = name.replace(" :", "").replaceAll(" ", "_").replace("-", "_").replace(":", "");
     if(color == "") {
         var reqColor = "";
     } else {
@@ -141,6 +188,7 @@ async function setPriceForItemBubble(name, color, oldPrice, priceSpan) {
     }
     var price = await doItemRequest(reqName, reqColor, "currentPriceRange") + " Cr";
     if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
+    if(price == "no Cr") price = "Error";
     priceSpan.innerHTML = price;
 
     if(oldPrice.includes(' - ')) {
@@ -302,10 +350,12 @@ async function selectColor(color) {
     var itemImage = document.getElementById('itemimage');
     var stop = false;
 
-    var itemImageURL = await doItemRequest(itemnameLabel.innerText.replace(" : ", "_").replace(" ", "_"), "/" + color.replace("default", ""), true);
+    $("#itemimage").animate({ opacity: 0 }, "fast");
+    var itemNameSearch = itemnameLabel.innerText.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
+    var itemImageURL = await doItemRequest(itemNameSearch, "/" + color.replace("default", ""), true);
     itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
     itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
-
+    $("#itemimage").animate({ opacity: 1 }, "fast");
     switch(color) {
         case "black":
             colorbutton.innerHTML = "Black";
@@ -388,11 +438,12 @@ async function selectColor(color) {
             colorpicker.style.visibility = "hidden";
         });
         if(color == "default") {
-            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML.replace(" ", "_").replace(": ", ""), "", "currentPriceRange") + " Cr";
+            var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
+            priceLabel.innerHTML = itemPrice.replace("yet. Cr", "yet.");
         } else {
-            priceLabel.innerHTML = await doItemRequest(itemnameLabel.innerHTML.replace(" ", "_").replace(": ", ""), "/" + color, "currentPriceRange") + " Cr";
+            var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
+            priceLabel.innerHTML = itemPrice.replace("yet. Cr", "yet.");
         }
-        
     }
 }
 
@@ -403,7 +454,7 @@ function addItemToInventory() {
 
     if(itemnameLabel.innerText != "An error happened") {
         if(colorbutton.innerText != "Choose a color") {
-            if(priceLabel.innerText != "Please select a color") {
+            if(priceLabel.innerText != "Please select a color" && priceLabel.innerText != "no Cr") {
                 var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
                 var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
@@ -455,7 +506,7 @@ function addItemToInventory() {
                         color = "";
                         break;
                 }
-                userDataContent.inventory.push({"name":itemnameLabel.innerText, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
+                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.inventory.length + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
                 console.log("Added item :\"" + itemnameLabel.innerText + "\" to inventory.");
                 pageLoad();

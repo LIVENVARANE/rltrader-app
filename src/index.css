@@ -146,7 +146,7 @@ header i {
 #settingswindow #settings-page .content h3 {
     font-weight: normal;
     text-align: left;
-    margin: 10px 0px 10px 13%;
+    margin: 0px 0px 10px 13%;
 }
 
 #settingswindow #settings-page .content select {
@@ -245,7 +245,8 @@ header i {
     width: 50px;
     visibility: hidden;
     position: absolute;
-    left: calc(50% - 25px);
+    top: 3px;
+    right: 310px;
 }
 
 #additemwindow #iteminfo {
@@ -492,17 +493,12 @@ footer #selectedtitle {
     transition: 0.2s ease-in;
 }
 
-footer #actions-container {
-    color: rgb(201, 201, 201) !important;
-    display: contents;
-
-    transition: 0.2s ease-in;
-}
-
-footer #actions-container .f-action {
+footer .f-action {
     margin: 0px 12px;
     cursor: pointer;
-    color: unset;
+    color: rgb(201, 201, 201);
+
+    transition: 0.2s ease-in;
 }
 
 footer .f-white {
