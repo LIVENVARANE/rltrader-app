@@ -74,6 +74,20 @@ function pageLoad() {
                     i++;
                 });
                 $("#inv-container").append("<br /><br /><br /><br />");
+
+                new Sortable(invContainer, {
+                    handle:'.item',
+                    animation:200,
+                    onUpdate: function() {
+                        $('#inv-container').children('div').each(function () {
+                            var itemId = $(this).attr('id');
+                            if(document.getElementById(itemId).id.includes("db-item")) {
+                                bringItemToFront(parseInt(itemId.replace("db-item", "")));
+                            }
+                        });
+                        console.log("Saved order changes for inventory")
+                    }
+                })
             }
         } else {
             console.log("File userdata.json not found, creating one..");
@@ -90,6 +104,27 @@ function pageLoad() {
 }
 
 window.onload = pageLoad;
+
+function bringItemToFront(id) {
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+
+    var i = 0;
+    var tempItem;
+    userDataContent.inventory.forEach(item => {
+        if(item.id == id) {
+            tempItem = item;
+            userDataContent.inventory.splice(i, 1);
+        }
+        i++;
+    });
+
+    if(tempItem) {
+        userDataContent.inventory.push(tempItem);
+    }
+
+    fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+}
 
 var selectedItems = [];
 
@@ -506,7 +541,9 @@ function addItemToInventory() {
                         color = "";
                         break;
                 }
-                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.inventory.length + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
+
+                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.idIncrement + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
+                idIncrement++;
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
                 console.log("Added item :\"" + itemnameLabel.innerText + "\" to inventory.");
                 pageLoad();

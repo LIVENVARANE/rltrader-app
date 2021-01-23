@@ -526,7 +526,7 @@ footer .separator {
     position: absolute;
     bottom: 0px;
     z-index: -3;
-    height: 608px;
+    height: 628px;
     overflow-y: auto;
 }
 
