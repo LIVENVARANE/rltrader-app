@@ -7,13 +7,27 @@ function pageLoad() {
     if(fs.existsSync(dataFolderPath + "/data/")) {
         var userDataPath = dataFolderPath + "/data/userdata.json";
 
+        //GET INFO ERRORS FILE CREATION ------------------------------------
+        var errorLogsPath = dataFolderPath + "/data/errorlogs.json";
+
+        if(!fs.existsSync(errorLogsPath)) {
+            console.log("File errorlogs.json not found, creating one..");
+
+            var initialContent = {errorlogs: []};
+            fs.writeFileSync(errorLogsPath, JSON.stringify(initialContent, null, 4),'utf-8');
+
+        }
+        // REMOVE AND NO MORE ERRORLOGS.JSON FILES ------------------------------------
+
         if(fs.existsSync(userDataPath)) {
             var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
             document.getElementById("itemsearch").addEventListener("keyup", function(event) {
-                if (event.key == 'Enter') {
+                if(event.key == 'Enter') {
                     event.preventDefault();
                     $(".search").click();
+                } else if(event.key == 'Escape') {
+                    addItemWindow();
                 }
             });
 
@@ -29,8 +43,8 @@ function pageLoad() {
                     itemDiv.className = "item";
                     itemDiv.style.borderTop = "2px solid " + item.cssColor;
                     itemDiv.align = "left";
-                    itemDiv.id = "db-item" + i;
-                    itemDiv.setAttribute("onclick", "selectItem(" + i + ")")
+                    itemDiv.id = "db-item" + item.id;
+                    itemDiv.setAttribute("onclick", "selectItem(" + item.id + ")")
                     invContainer.appendChild(itemDiv);
 
                     var infoDiv = document.createElement('div');
@@ -66,7 +80,7 @@ function pageLoad() {
                     var selectContainer = document.createElement('div');
                     selectContainer.innerHTML = '<i class="far fa-square"></i>';
                     selectContainer.className = "selectcontainer";
-                    selectContainer.id = "db-item-cb" + i;
+                    selectContainer.id = "db-item-cb" + item.id;
                     itemDiv.appendChild(selectContainer);
 
                     setPriceForItemBubble(item.name, item.color, item.lastCreditPrice, itemPrice);
@@ -129,13 +143,34 @@ function bringItemToFront(id) {
 var selectedItems = [];
 
 function doItemAction(type) {
-    if(selectedItems.length == 0) {
+    if(selectedItems.length != 0) {
+        var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+        var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
         switch(type) {
             case "fav":
                 
                 break;
             case "del":
-                //when found array values in json for the items id, edit all the item ids after the removed item id to still be 1, 2, 3, 4, 5
+                selectedItems.forEach(itemId => {
+                    var i = 0;
+                    userDataContent.inventory.forEach(item => {
+                        if(item.id == itemId) {
+                            userDataContent.inventory.splice(i, 1);
+                            $("#db-item" + itemId).fadeOut("fast", function() {
+                                document.getElementById("db-item" + itemId).remove();
+                            });
+                        }
+                        i++;
+                   });
+                });
+                fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+                document.getElementById('alertbox-span').innerHTML = "Item removed from your inventory";
+                $('.alertbox').css("background-color", "#2ecc71");
+                $('.alertbox').animate({ opacity: 1 }, "fast", function() {
+                    setTimeout(function () {
+                        $('.alertbox').animate({ opacity: 0 }, "fast");
+                    }, 5000);
+                });
                 break;
             case "dup":
                 
@@ -152,7 +187,6 @@ function doItemAction(type) {
 }
 
 function selectItem(id) {
-    var item = document.getElementById("db-item" + id);
     var itemCheckbox = document.getElementById("db-item-cb" + id);
     var selectedTitle = document.getElementById("selectedtitle");
     var actionFav = document.getElementById("actionFav");
@@ -209,7 +243,6 @@ function selectItem(id) {
             actionDup.style.color = "white";
             actionEdi.style.color = "rgb(201, 201, 201)";
             actionEdi.title = "Cannot edit more than one item at once";
-
         }
     }
 }
@@ -389,7 +422,15 @@ async function selectColor(color) {
     var itemNameSearch = itemnameLabel.innerText.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
     var itemImageURL = await doItemRequest(itemNameSearch, "/" + color.replace("default", ""), true);
     itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
-    itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
+    try {
+        itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
+    } catch (error) {
+        var errorLogsPath = (electron.app || electron.remote.app).getPath('userData') + "/data/errorlogs.json";
+        var errorLogsContent = JSON.parse(fs.readFileSync(errorLogsPath, 'utf-8').toString());
+        errorLogsContent.errorlogs.push({"Function":"SelectColor","Reason":"Getting image src","Log":itemImageURL});
+        fs.writeFileSync(userDataPath, JSON.stringify(errorLogsContent, null, 4));
+    }
+
     $("#itemimage").animate({ opacity: 1 }, "fast");
     switch(color) {
         case "black":
@@ -474,10 +515,15 @@ async function selectColor(color) {
         });
         if(color == "default") {
             var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
-            priceLabel.innerHTML = itemPrice.replace("yet. Cr", "yet.");
         } else {
             var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
-            priceLabel.innerHTML = itemPrice.replace("yet. Cr", "yet.");
+        }
+        priceLabel.innerHTML = itemPrice.replace("yet. Cr", "yet.").replace("no Cr", "Error");
+        if(priceLabel.innerHTML.includes("Error")) {
+            var errorLogsPath = (electron.app || electron.remote.app).getPath('userData') + "/data/errorlogs.json";
+            var errorLogsContent = JSON.parse(fs.readFileSync(errorLogsPath, 'utf-8').toString());
+            errorLogsContent.errorlogs.push({"Function":"SelectColor","Reason":"Getting price","Log":itemPrice});
+            fs.writeFileSync(userDataPath, JSON.stringify(errorLogsContent, null, 4));
         }
     }
 }
@@ -489,7 +535,7 @@ function addItemToInventory() {
 
     if(itemnameLabel.innerText != "An error happened") {
         if(colorbutton.innerText != "Choose a color") {
-            if(priceLabel.innerText != "Please select a color" && priceLabel.innerText != "no Cr") {
+            if(priceLabel.innerText != "Please select a color" && priceLabel.innerText != "no Cr" && priceLabel.innerText != "Error") {
                 var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
                 var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
@@ -543,9 +589,9 @@ function addItemToInventory() {
                 }
 
                 userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.idIncrement + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
-                idIncrement++;
+                userDataContent.idIncrement++;
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
-                console.log("Added item :\"" + itemnameLabel.innerText + "\" to inventory.");
+                console.log("Added item: \"" + itemnameLabel.innerText + "\" to inventory.");
                 pageLoad();
 
                 $(".aiw-container").animate({ top: "-50px" }, "fast");
@@ -558,7 +604,7 @@ function addItemToInventory() {
                     }, 500);
                 });
 
-                document.getElementById('alertbox-span').innerHTML = "Item successfully added to your inventory";
+                document.getElementById('alertbox-span').innerHTML = "Item added to your inventory";
                 $('.alertbox').css("background-color", "#2ecc71");
                 $('.alertbox').animate({ opacity: 1 }, "fast", function() {
                     setTimeout(function () {

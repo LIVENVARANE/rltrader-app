@@ -104,10 +104,10 @@
         <span style="font-weight: bold; line-height: 3;" id="f-username">LIVEN</span>
         <div class="separator"></div>
         <span id="selectedtitle"><i>No item selected</i></span>
-        <span class="f-action" id="actionFav"><i class="far fa-star"></i></i></span>
-        <span class="f-action" id="actionDel"><i class="far fa-trash-alt"></i></span>
-        <span class="f-action" id="actionDup"><i class="far fa-clone"></i></span>
-        <span class="f-action" id="actionEdi" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
+        <span class="f-action" id="actionFav" onclick="doItemAction('fav')"><i class="far fa-star"></i></i></span>
+        <span class="f-action" id="actionDel" onclick="doItemAction('del')"><i class="far fa-trash-alt"></i></span>
+        <span class="f-action" id="actionDup" onclick="doItemAction('dup')"><i class="far fa-clone"></i></span>
+        <span class="f-action" id="actionEdi" onclick="doItemAction('edi')" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
         <div class="separator"></div>
         <span class="new-item" onclick="addItemWindow()">ADD NEW ITEM</span>
         <div class="separator"></div>

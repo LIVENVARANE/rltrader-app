@@ -522,11 +522,11 @@ footer .separator {
 }
 
 #inv-container {
-    padding: 30px 20px 53px 20px;
+    padding: 20px 20px 53px 20px;
     position: absolute;
     bottom: 0px;
     z-index: -3;
-    height: 628px;
+    height: 638px;
     overflow-y: auto;
 }
 
