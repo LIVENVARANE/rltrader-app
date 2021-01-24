@@ -1,9 +1,10 @@
 const electron = require("electron");
 const fs = require("fs");
+const { resolve } = require("path");
 
 function pageLoad() {
     const dataFolderPath = (electron.app || electron.remote.app).getPath('userData');
-     
+
     if(fs.existsSync(dataFolderPath + "/data/")) {
         var userDataPath = dataFolderPath + "/data/userdata.json";
 
@@ -35,9 +36,9 @@ function pageLoad() {
                 document.getElementById('welcome-screen').style.display = "block";
             }
             else {
+                document.getElementById("f-username").innerText = userDataContent.username;
                 var invContainer = document.getElementById("inv-container");
                 invContainer.innerHTML = "";
-                var i = 1; //starting with 1 to align with item ids in userdata.json
                 userDataContent.inventory.forEach(item => {
                     var itemDiv = document.createElement('div');
                     itemDiv.className = "item";
@@ -58,7 +59,9 @@ function pageLoad() {
 
                     var itemName = document.createElement('span');
                     itemName.innerHTML = item.name;
-                    itemName.className = "itemname";
+                    if(item.name.includes(":")) {
+                        itemName.className = "bigitemname";
+                    } else itemName.className = "itemname";
                     infoDiv.appendChild(itemName);
 
                     var itemColor = document.createElement('span');
@@ -83,9 +86,8 @@ function pageLoad() {
                     selectContainer.id = "db-item-cb" + item.id;
                     itemDiv.appendChild(selectContainer);
 
-                    setPriceForItemBubble(item.name, item.color, item.lastCreditPrice, itemPrice);
+                    setPriceForItemBubble(item.name, item.color, item.lastCreditPrice, itemPrice, item.id);
                 
-                    i++;
                 });
                 $("#inv-container").append("<br /><br /><br /><br />");
 
@@ -148,7 +150,23 @@ function doItemAction(type) {
         var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
         switch(type) {
             case "fav":
-                
+                selectedItems.forEach(itemId => {
+                    var isFav = getKeyForItem(itemId, "isFavorite");
+                    if(isFav) modifyKeyForItem(itemId, "isFavorite", false);
+                    else modifyKeyForItem(itemId, "isFavorite", true);
+                    document.getElementById("db-item-cb" + itemId).innerHTML = '<i class="far fa-square"></i>';
+                    document.getElementById("db-item-cb" + itemId).style.opacity = 0;
+                });
+                var isMult = "";
+                if(selectedItems.length >= 2) isMult = "s";
+                document.getElementById('alertbox-span').innerHTML = "Item" + isMult + " added/removed from favorites";
+                $('.alertbox').css("background-color", "#2ecc71");
+                $('.alertbox').animate({ opacity: 1 }, "fast", function() {
+                    setTimeout(function () {
+                        $('.alertbox').animate({ opacity: 0 }, "fast");
+                    }, 5000);
+                });
+                selectItem("clear");
                 break;
             case "del":
                 selectedItems.forEach(itemId => {
@@ -163,6 +181,7 @@ function doItemAction(type) {
                         i++;
                    });
                 });
+                selectItem("clear");
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
                 document.getElementById('alertbox-span').innerHTML = "Item removed from your inventory";
                 $('.alertbox').css("background-color", "#2ecc71");
@@ -177,7 +196,7 @@ function doItemAction(type) {
                 break;
             case "edi":
                 if(selectedItems.length == 1) { //can only edit one item at once
-
+                    editItemWindow(selectedItems[0]);
                 }
                 break;
             default:
@@ -194,9 +213,25 @@ function selectItem(id) {
     var actionDup = document.getElementById("actionDup");
     var actionEdi = document.getElementById("actionEdi");
 
+    if(id == "clear") {
+        selectedItems = [];
+        selectedTitle.innerHTML = "<i>No item selected</i>";
+        selectedTitle.style.color = "rgb(201, 201, 201)";
+        actionFav.style.color = "rgb(201, 201, 201)";
+        actionDel.style.color = "rgb(201, 201, 201)";
+        actionDup.style.color = "rgb(201, 201, 201)";
+        actionEdi.style.color = "rgb(201, 201, 201)";
+        actionFav.style.cursor = "not-allowed";
+        actionDel.style.cursor = "not-allowed";
+        actionDup.style.cursor = "not-allowed";
+        actionEdi.style.cursor = "not-allowed";
+
+        return;
+    }
+
     if(itemCheckbox.innerHTML == '<i class="far fa-check-square"></i>') { //selected
         itemCheckbox.innerHTML = '<i class="far fa-square"></i>';
-        itemCheckbox.style.opacity = 0;
+        itemCheckbox.style.removeProperty('opacity');
         selectedItems = selectedItems.filter(function(e) { return e !== id })
         if(selectedItems.length == 0) {
             selectedTitle.innerHTML = "<i>No item selected</i>";
@@ -205,7 +240,10 @@ function selectItem(id) {
             actionDel.style.color = "rgb(201, 201, 201)";
             actionDup.style.color = "rgb(201, 201, 201)";
             actionEdi.style.color = "rgb(201, 201, 201)";
-            actionEdi.title = null;
+            actionFav.style.cursor = "not-allowed";
+            actionDel.style.cursor = "not-allowed";
+            actionDup.style.cursor = "not-allowed";
+            actionEdi.style.cursor = "not-allowed";
         }
         else if(selectedItems.length == 1) { 
             selectedTitle.innerHTML = selectedItems.length + " item selected";
@@ -213,7 +251,10 @@ function selectItem(id) {
             actionDel.style.color = "white";
             actionDup.style.color = "white";
             actionEdi.style.color = "white";
-            actionEdi.title = null;
+            actionFav.style.cursor = "pointer";
+            actionDel.style.cursor = "pointer";
+            actionDup.style.cursor = "pointer";
+            actionEdi.style.cursor = "pointer";
         }
         else {
             selectedTitle.innerHTML = selectedItems.length + " items selected";
@@ -221,7 +262,10 @@ function selectItem(id) {
             actionDel.style.color = "white";
             actionDup.style.color = "white";
             actionEdi.style.color = "rgb(201, 201, 201)";
-            actionEdi.title = "Cannot edit more than one item at once";
+            actionFav.style.cursor = "pointer";
+            actionDel.style.cursor = "pointer";
+            actionDup.style.cursor = "pointer";
+            actionEdi.style.cursor = "not-allowed";
         }
     } else {
         itemCheckbox.innerHTML = '<i class="far fa-check-square"></i>';
@@ -234,7 +278,10 @@ function selectItem(id) {
             actionDel.style.color = "white";
             actionDup.style.color = "white";
             actionEdi.style.color = "white";
-            actionEdi.title = null;
+            actionFav.style.cursor = "pointer";
+            actionDel.style.cursor = "pointer";
+            actionDup.style.cursor = "pointer";
+            actionEdi.style.cursor = "pointer";
         }
         else {
             selectedTitle.innerHTML = selectedItems.length + " items selected";
@@ -242,12 +289,15 @@ function selectItem(id) {
             actionDel.style.color = "white";
             actionDup.style.color = "white";
             actionEdi.style.color = "rgb(201, 201, 201)";
-            actionEdi.title = "Cannot edit more than one item at once";
+            actionFav.style.cursor = "pointer";
+            actionDel.style.cursor = "pointer";
+            actionDup.style.cursor = "pointer";
+            actionEdi.style.cursor = "not-allowed";
         }
     }
 }
 
-async function setPriceForItemBubble(name, color, oldPrice, priceSpan) {
+async function setPriceForItemBubble(name, color, oldPrice, priceSpan, id) {
     var reqName = name.replace(" :", "").replaceAll(" ", "_").replace("-", "_").replace(":", "");
     if(color == "") {
         var reqColor = "";
@@ -266,6 +316,14 @@ async function setPriceForItemBubble(name, color, oldPrice, priceSpan) {
         if(price.includes(' - ')) {
             price = price.replace(" - ", ":");
             price.split(':');
+            if(price[0].includes("k")) {
+                price[0].replace("k", "");
+                price[0] = parseInt(price[0] * 1000);
+            }
+            if(price[1].includes("k")) {
+                price[1].replace("k", "");
+                price[1] = parseInt(price[1] * 1000);
+            }
             price = price[0] + price[1];
             if(price > oldPrice) {
                 priceSpan.style.color = "green";
@@ -274,7 +332,39 @@ async function setPriceForItemBubble(name, color, oldPrice, priceSpan) {
                 priceSpan.style.color = "red";
             }
         }
+    } else {
+        if(price.includes(" - ")) {
+            modifyKeyForItem(id, "lastCreditPrice", price);
+        }
     }
+}
+
+function getKeyForItem(id, key) {
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+
+    var done;
+    userDataContent.inventory.forEach(item => {
+        if(item.id == id) {
+            done = item[key];
+        }
+    });
+
+    return done;
+}
+
+
+function modifyKeyForItem(id, key, value) {
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+
+    userDataContent.inventory.forEach(item => {
+        if(item.id == id) {
+            item[key] = value;
+        }
+    });
+    
+    fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
 }
 
 function startConfig(type) {
@@ -334,91 +424,79 @@ function startConfig(type) {
     }
 }
 
-function addItemWindow() {
-    var aiw = document.getElementById('additemwindow'); //cp iteminfo
-    if(aiw.style.visibility == "visible") {
-        $(".aiw-container").animate({ top: "-50px" }, "fast");
-        $("#additemwindow").animate({ opacity: 0 }, "fast", function() {
-            setTimeout(function () {
-                aiw.style.visibility = "hidden";
-                document.getElementById('colorpicker').style.visibility = "hidden";
-                document.getElementById('iteminfo').style.visibility = "hidden";
-                document.querySelector("footer").style.zIndex = 0;
-            }, 100);
-        });
-    } else { //hidden
-        document.querySelector("footer").style.zIndex = -1;
-        aiw.style.visibility = "visible";
-        aiw.style.opacity = 0;
-        $("#additemwindow").animate({ opacity: 1 }, "fast");
-        $(".aiw-container").animate({ top: "10px" }, "fast");
-        document.getElementById('itemsearch').focus();
+var editPriceOption = 1;
+
+function editPriceType(option) {
+    var sameOption = false;
+    for (var i = 1; i < 4 ; i++) {
+        var radio = document.getElementById("price-radio" + i);
+        if(i == option) { //this is the selected radio
+            if(radio.innerHTML.includes("check") && option == 2) sameOption = true;
+            radio.style.backgroundColor = "#00b894";
+            radio.innerHTML = radio.innerHTML.replace('<i class="far fa-square"></i>', '<i class="far fa-check-square"></i>');
+        } else {
+            radio.style.backgroundColor = "#ff6b81";
+            radio.innerHTML = radio.innerHTML.replace('<i class="far fa-check-square"></i>', '<i class="far fa-square"></i>')
+        }
     }
+
+    if(!sameOption) {
+        switch(option) {
+            case 1: //dont do anything
+                document.getElementById("editpricelabel").innerHTML = document.getElementById("editpricelabel").innerHTML.replace("Price will be changed to: ", "Price will not be changed");
+                document.getElementById("editprice").innerText = "";
+                break;
+            case 2: //reset to current price
+                document.getElementById("editpricelabel").innerHTML = document.getElementById("editpricelabel").innerHTML.replace("Price will not be changed", "Price will be changed to: ");
+                document.getElementById("editprice").innerText = "Loading...";
+                selectColor(document.getElementById("editcolorbutton").innerText.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue"), "edit")
+                break;
+            case 3: //custom price span
+                document.getElementById("editpricelabel").innerHTML = document.getElementById("editpricelabel").innerHTML.replace("Price will not be changed", "Price will be changed to: ");
+                document.getElementById("editprice").innerText = "SPAN HERE";
+                break;
+            default:
+                break;
+        }
+    }
+
+    if(option == 3) {
+        document.getElementById("price-right").style.opacity = 1;
+        document.getElementById("edit-pricespan1").disabled = false;
+        document.getElementById("edit-pricespan2").disabled = false;
+    } else {
+        document.getElementById("price-right").style.opacity = 0.5;
+        document.getElementById("edit-pricespan1").disabled = true;
+        document.getElementById("edit-pricespan2").disabled = true;
+    }
+
+    editPriceOption = option;
 }
 
-function settingsWindow() {
-    var sw = document.getElementById('settingswindow');
-    if(sw.style.visibility == "visible") {
-        $("#settingswindow").animate({ opacity: 0 }, "fast", function() {
-            setTimeout(function () {
-                sw.style.visibility = "hidden";
-                document.querySelector("footer").style.zIndex = 0;
-            }, 100);
-        });
-    } else { //hidden
-        document.querySelector("footer").style.zIndex = -1;
-        sw.style.visibility = "visible";
-        sw.style.opacity = 0;
-        $("#settingswindow").animate({ opacity: 1 }, "fast");
-    }
-}
-
-function toggleToolbar() {
-    var toolbar = document.querySelector("footer");
-    if(toolbar.style.bottom == "23px") { //will hide
-        $("footer").animate({ bottom: "-46px" });
-        $(".toolbar-toggler").animate({ top: "-20px" }, "fast");
-        $(".toolbar-toggler").animate({ opacity: 0 }, "fast", function() {
-            $(".toolbar-toggler").parent().html("<i class=\"fas fa-chevron-up toolbar-toggler\" onclick=\"toggleToolbar()\"></i>");
-            $(".toolbar-toggler").css("top", "-20px");
-        });
-        $(".toolbar-toggler").animate({ opacity: 1 }, "fast");
-
-        $("#f-username").animate({ top: "-54px" }, "fast");
-    } else { //will show
-        $("footer").animate({ bottom: "23px" });
-        $(".toolbar-toggler").animate({ top: "0px" }, "fast");
-        $(".toolbar-toggler").animate({ opacity: 0 }, "fast", function() {
-            $(".toolbar-toggler").parent().html("<i class=\"fas fa-chevron-down toolbar-toggler\" onclick=\"toggleToolbar()\"></i>");
-            $(".toolbar-toggler").css("top", "0px");
-        });
-        $(".toolbar-toggler").animate({ opacity: 1 }, "fast");
-        $("#f-username").animate({ top: "-34px" }, "fast");
-    }
-}
-
-function colorPicker() {
-    var cp = document.getElementById('colorpicker'); //cp iteminfo
+function colorPicker(number) {
+    var cp = document.getElementById('colorpicker' + number); //cp iteminfo
     if(cp.style.visibility == "visible") {
-        $("#colorpicker").animate({ opacity: 0 }, "fast", function() {
+        $("#colorpicker" + number).animate({ opacity: 0 }, "fast", function() {
             cp.style.visibility = "hidden";
         });
     } else { //hidden
         cp.style.visibility = "visible";
         cp.style.opacity = 0;
-        $("#colorpicker").animate({ opacity: 1 }, "fast");
+        $("#colorpicker" + number).animate({ opacity: 1 }, "fast");
     }
 }
 
-async function selectColor(color) {
-    var colorbutton = document.getElementById('colorbutton');
-    var priceLabel = document.getElementById('price');
-    var colorpicker = document.getElementById('colorpicker');
-    var itemnameLabel = document.getElementById('item-name');
-    var itemImage = document.getElementById('itemimage');
+async function selectColor(color, alternate) {
+    var colorbutton = document.getElementById(alternate + 'colorbutton');
+    var priceLabel = document.getElementById(alternate + 'price');
+    if(alternate != "") var colorpicker = document.getElementById('colorpicker1');
+    else var colorpicker = document.getElementById('colorpicker');
+    
+    var itemnameLabel = document.getElementById(alternate + 'item-name');
+    var itemImage = document.getElementById(alternate + 'itemimage');
     var stop = false;
 
-    $("#itemimage").animate({ opacity: 0 }, "fast");
+    $("#" + alternate +"itemimage").animate({ opacity: 0 }, "fast");
     var itemNameSearch = itemnameLabel.innerText.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
     var itemImageURL = await doItemRequest(itemNameSearch, "/" + color.replace("default", ""), true);
     itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
@@ -431,7 +509,7 @@ async function selectColor(color) {
         fs.writeFileSync(userDataPath, JSON.stringify(errorLogsContent, null, 4));
     }
 
-    $("#itemimage").animate({ opacity: 1 }, "fast");
+    $("#" + alternate +"itemimage").animate({ opacity: 1 }, "fast");
     switch(color) {
         case "black":
             colorbutton.innerHTML = "Black";
@@ -441,7 +519,7 @@ async function selectColor(color) {
         case "white":
             colorbutton.innerHTML = "Titanium White";
             colorbutton.style.background = "#dbdbdb";
-            colorbutton.style.color = "white";
+            colorbutton.style.color = "black";
             break;
         case "grey":
             colorbutton.innerHTML = "Grey";
@@ -505,26 +583,26 @@ async function selectColor(color) {
             break;
         default:
             alert("An error hapenned, please restart RLTrader. Error code: WCSCF");
-            stop = true;
-            break;
+            return;
     }
 
-    if(!stop) {
-        $("#colorpicker").animate({ opacity: 0 }, "fast", function() {
-            colorpicker.style.visibility = "hidden";
-        });
-        if(color == "default") {
-            var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
-        } else {
-            var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
-        }
-        priceLabel.innerHTML = itemPrice.replace("yet. Cr", "yet.").replace("no Cr", "Error");
-        if(priceLabel.innerHTML.includes("Error")) {
-            var errorLogsPath = (electron.app || electron.remote.app).getPath('userData') + "/data/errorlogs.json";
-            var errorLogsContent = JSON.parse(fs.readFileSync(errorLogsPath, 'utf-8').toString());
-            errorLogsContent.errorlogs.push({"Function":"SelectColor","Reason":"Getting price","Log":itemPrice});
-            fs.writeFileSync(userDataPath, JSON.stringify(errorLogsContent, null, 4));
-        }
+    if(alternate != "") var colorpicker1 = "#colorpicker1";
+    else var colorpicker1 = "#colorpicker";
+    $(colorpicker1).animate({ opacity: 0 }, "fast", function() {
+        colorpicker.style.visibility = "hidden";
+    });
+    if(color == "default") {
+        var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
+    } else {
+        var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
+    }
+    if(alternate != "" && editPriceOption != 2) return;
+    priceLabel.innerHTML = itemPrice.replace("yet. Cr", "yet.").replace("no Cr", "Error");
+    if(priceLabel.innerHTML.includes("Error")) {
+        var errorLogsPath = (electron.app || electron.remote.app).getPath('userData') + "/data/errorlogs.json";
+        var errorLogsContent = JSON.parse(fs.readFileSync(errorLogsPath, 'utf-8').toString());
+        errorLogsContent.errorlogs.push({"Function":"SelectColor","Reason":"Getting price","Log":itemPrice});
+        fs.writeFileSync(userDataPath, JSON.stringify(errorLogsContent, null, 4));
     }
 }
 
@@ -560,7 +638,7 @@ function addItemToInventory() {
                         color = "pink";
                         break;
                     case "Cobalt":
-                        color = "cabalt";
+                        color = "cobalt";
                         break;
                     case "Sky Blue":
                         color = "sblue";
@@ -588,7 +666,7 @@ function addItemToInventory() {
                         break;
                 }
 
-                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.idIncrement + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price});
+                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.idIncrement + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price, "isFavorite":false});
                 userDataContent.idIncrement++;
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
                 console.log("Added item: \"" + itemnameLabel.innerText + "\" to inventory.");

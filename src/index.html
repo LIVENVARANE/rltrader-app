@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <link rel="stylesheet" href="index.css" />
         <script src="js/index.js"></script>
+        <script src="js/windows.js"></script>
         <script src="js/rliservices.js"></script>
         <script src="js/Sortable.js"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
@@ -44,28 +45,28 @@
             </div>
             <img src="assets/loading.svg" draggable="false" id="aiw-loading" />
             <br />
-            <div id="iteminfo">
+            <div id="iteminfo"> <!-- ADD ITEM WINDOW HERE -->
                 <h1>Add this item ?</h2>
                 <div align="left" style="padding: 20px;">
                     <img src="" id="itemimage" />
                     <h2 id="item-name" style="font-weight: bold; left: 0px;">An error happened</h3><br />
-                    <h2>Color: <span id="colorbutton" title="Click here to change color" onclick="colorPicker();">An error happened</span></h2><div id="colorpicker">
+                    <h2>Color: <span id="colorbutton" title="Click here to change color" onclick="colorPicker('');">An error happened</span></h2><div id="colorpicker">
                         <li style="text-align: center; display: list-item; border-radius: 5px 5px 0px 0px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9); cursor: default;">Available Colors</li>
                         <li id="cp-black" onclick="" style="background-color: black; color: white;">Black</li>
-                        <li id="cp-white" style="background-color: #dbdbdb;">Titanium White</li>
-                        <li id="cp-grey" style="background-color: grey;">Grey</li>
-                        <li id="cp-crimson" style="background-color: #de1b1b;">Crimson</li>
-                        <li id="cp-pink" style="background-color: pink;">Pink</li>
-                        <li id="cp-cobalt" style="background-color: #1b5cde;">Cobalt</li>
-                        <li id="cp-sblue" style="background-color: #09e9ed;">Sky Blue</li>
-                        <li id="cp-sienna" style="background-color: brown;">Burnt Sienna</li>
-                        <li id="cp-saffron" style="background-color: yellow;">Saffron</li>
-                        <li id="cp-lime" style="background-color: #07eb12;">Lime</li>
-                        <li id="cp-fgreen" style="background-color: #0d7522;">Forest Green</li>
-                        <li id="cp-orange" style="background-color: orange;">Orange</li>
-                        <li id="cp-purple" style="background-color: purple;">Purple</li>
-                        <li id="cp-default" style="background-color: rgb(49, 49, 49); color: white;">Default</li>
-                        <li style="text-align: center; display: list-item; border-radius: 0px 0px 5px 5px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9);" onclick="colorPicker();"><u>Close</u></li>
+                        <li id="cp-white" class="listitem" style="background-color: #dbdbdb;">Titanium White</li>
+                        <li id="cp-grey" class="listitem" style="background-color: grey;">Grey</li>
+                        <li id="cp-crimson" class="listitem" style="background-color: #de1b1b;">Crimson</li>
+                        <li id="cp-pink" class="listitem" style="background-color: pink;">Pink</li>
+                        <li id="cp-cobalt" class="listitem" style="background-color: #1b5cde;">Cobalt</li>
+                        <li id="cp-sblue" class="listitem" style="background-color: #09e9ed;">Sky Blue</li>
+                        <li id="cp-sienna" class="listitem" style="background-color: brown;">Burnt Sienna</li>
+                        <li id="cp-saffron" class="listitem" style="background-color: yellow;">Saffron</li>
+                        <li id="cp-lime" class="listitem" style="background-color: #07eb12;">Lime</li>
+                        <li id="cp-fgreen" class="listitem" style="background-color: #0d7522;">Forest Green</li>
+                        <li id="cp-orange" class="listitem" style="background-color: orange;">Orange</li>
+                        <li id="cp-purple" class="listitem" style="background-color: purple;">Purple</li>
+                        <li id="cp-default" class="listitem" style="background-color: rgb(49, 49, 49); color: white;">Default</li>
+                        <li style="text-align: center; display: list-item; border-radius: 0px 0px 5px 5px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9);" onclick="colorPicker('');"><u>Close</u></li>
                     </div><br />
                     <h2 id="rarity">Rarity: An error happened</h2><br />
                     <h2 id="type">Type: An error happened</h2><br />
@@ -99,19 +100,72 @@
                 </div>
             </div>
         </div>
+        <div id="edititemwindow"> <!-- EDIT ITEM WINDOW HERE -->
+            <div id="edititem-page"><i class="fas fa-times close" onclick="editItemWindow()"></i>
+                <h1>Edit item</h1>
+                <div align="left" style="padding: 20px;">
+                    <img src="" id="edititemimage" />
+                    <h2 id="edititem-name" style="font-weight: bold; left: 0px;">Loading..</h3><br />
+                    <h2 style="margin-left: 3px;">Color: <span id="editcolorbutton" title="Click here to change color" onclick="colorPicker('1');">An error happened</span></h2><div id="colorpicker1" style="visibility: hidden;">
+                        <li id="edit-title" style="text-align: center; display: list-item; border-radius: 5px 5px 0px 0px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9); cursor: default;">Available Colors</li>
+                        <li id="cp1-black" class="editlistitem" style="background-color: black; color: white;">Black</li>
+                        <li id="cp1-white" class="editlistitem" style="background-color: #dbdbdb;">Titanium White</li>
+                        <li id="cp1-grey" class="editlistitem" style="background-color: grey;">Grey</li>
+                        <li id="cp1-crimson" class="editlistitem" style="background-color: #de1b1b;">Crimson</li>
+                        <li id="cp1-pink" class="editlistitem" style="background-color: pink;">Pink</li>
+                        <li id="cp1-cobalt" class="editlistitem" style="background-color: #1b5cde;">Cobalt</li>
+                        <li id="cp1-sblue" class="editlistitem" style="background-color: #09e9ed;">Sky Blue</li>
+                        <li id="cp1-sienna" class="editlistitem" style="background-color: brown;">Burnt Sienna</li>
+                        <li id="cp1-saffron" class="editlistitem" style="background-color: yellow;">Saffron</li>
+                        <li id="cp1-lime" class="editlistitem" style="background-color: #07eb12;">Lime</li>
+                        <li id="cp1-fgreen" class="editlistitem" style="background-color: #0d7522;">Forest Green</li>
+                        <li id="cp1-orange" class="editlistitem" style="background-color: orange;">Orange</li>
+                        <li id="cp1-purple" class="editlistitem" style="background-color: purple;">Purple</li>
+                        <li id="cp1-default" class="editlistitem" style="background-color: rgb(49, 49, 49); color: white;">Default</li>
+                        <li style="text-align: center; display: list-item; border-radius: 0px 0px 5px 5px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9);" onclick="colorPicker('1');"><u>Close</u></li>
+                    </div><br />
+                    <div class="edit-ie-footer">
+                        <div class="separator"></div>
+                        <h2>Edit price</h2>
+                        <h5>This is the value RLTrader refers to to calculate if you are making profit when selling at the current price of the market.</h5>
+                        <div class="editpricecontainer">
+                            <div class="price-left">
+                                <div class="price-radio" onclick="editPriceType(1)" id="price-radio1" style="background-color: #00b894;"><i class="far fa-check-square"></i>Do not change the price</div>
+                                <div class="price-radio" onclick="editPriceType(2)" id="price-radio2"><i class="far fa-square"></i>Reset to current price</div>
+                                <div class="price-radio" onclick="editPriceType(3)" id="price-radio3"><i class="far fa-square"></i>Set custom price range</div>
+                            </div>
+                            <div class="separator"></div>
+                            <div id="price-right" style="opacity: 0.5;">
+                                <div align="center" style="position: relative; top: -25px;">
+                                    <h3 style="color: #3B3B58;">Set a price range</h3>
+                                    <input type="text" disabled id="edit-pricespan1" style="border-radius: 100px 50px 50px 100px;" /><span> to </span><input type="text" disabled id="edit-pricespan2" style="border-radius: 50px 100px 100px 50px;" />
+                                </div>
+                            </div>
+                        </div>
+                        <h4 id="editpricelabel">Price will be changed to: <span id="editprice">Loading...</span></h4>
+                        <div align="center">
+                            <div class="cancel-edititembutton" onclick="editItemWindow('')">CANCEL</div>
+                            <div class="edititembutton">SAVE</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <footer>
+    <footer style="bottom: 23px;">
         <span style="font-weight: bold; line-height: 3;" id="f-username">LIVEN</span>
         <div class="separator"></div>
         <span id="selectedtitle"><i>No item selected</i></span>
-        <span class="f-action" id="actionFav" onclick="doItemAction('fav')"><i class="far fa-star"></i></i></span>
-        <span class="f-action" id="actionDel" onclick="doItemAction('del')"><i class="far fa-trash-alt"></i></span>
-        <span class="f-action" id="actionDup" onclick="doItemAction('dup')"><i class="far fa-clone"></i></span>
-        <span class="f-action" id="actionEdi" onclick="doItemAction('edi')" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
-        <div class="separator"></div>
-        <span class="new-item" onclick="addItemWindow()">ADD NEW ITEM</span>
-        <div class="separator"></div>
-        <span class="f-white f-action"><i class="fas fa-chevron-down toolbar-toggler" onclick="toggleToolbar()"></i></span>
+        <div class="right">
+            <span class="f-action" id="actionFav" onclick="doItemAction('fav')"><i class="far fa-star"></i></i></span>
+            <span class="f-action" id="actionDel" onclick="doItemAction('del')"><i class="far fa-trash-alt"></i></span>
+            <span class="f-action" id="actionDup" onclick="doItemAction('dup')"><i class="far fa-clone"></i></span>
+            <span class="f-action" id="actionEdi" onclick="doItemAction('edi')" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
+            <div class="separator"></div>
+            <span class="new-item" onclick="addItemWindow()">ADD NEW ITEM</span>
+            <div class="separator"></div>
+            <span class="f-white f-action"><i class="fas fa-chevron-down toolbar-toggler" title="Toggle the toolbar" onclick="toggleToolbar()"></i></span>
+        </div>
     </footer>
     <div class="alertbox"><i style="margin-right: 7px;" class="fas fa-info-circle"></i><span id="alertbox-span">An error happened</span></div>
 </html>

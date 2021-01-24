@@ -118,8 +118,6 @@ async function searchForItem() {
     availableColors = availableColors + " " + await doItemRequest(itemsearch, "/purple");
     availableColors = availableColors + " " + await doItemRequest(itemsearch, "");
     availableColors = availableColors.replaceAll(" no", ""); //we get all the colors that exists for that item
-    
-    console.log("Available colors: ", availableColors);
 
     if(availableColors == "") {
         alert("This item does not exist or it is not tradeable, make sure you typed the name correctly.");
@@ -182,6 +180,7 @@ async function searchForItem() {
         iteminfo.style.opacity = 0;
         $("#iteminfo").animate({ opacity: 1 }, "fast");
         itemimage.src = itemPicURL;
+        itemimage.setAttribute("draggable", "false");
         itemnameLabel.innerHTML = decalCar + itemname + specialEditionName;
         rarityLabel.innerHTML = "Rarity: " + rarity;
         typeLabel.innerHTML = "Type: " + type;
@@ -278,9 +277,14 @@ async function searchForItem() {
         priceLabel.innerHTML = price;
 
         //removing colors in the colorpicker that does not exist for this item
+        var colorListItems = document.getElementsByClassName("listitem");
+        for(var i = 0; i < colorListItems.length; i++) {
+            colorListItems[i].style.display = "none";
+        }
+
         stockAC_withDefault.split(" ").forEach(e => {
             document.getElementById("cp-" + e).style.display = "list-item";
-            document.getElementById("cp-" + e).setAttribute('onclick', 'selectColor("' + e + '")');
+            document.getElementById("cp-" + e).setAttribute('onclick', 'selectColor("' + e + '", "")');
         });
     }
 }
