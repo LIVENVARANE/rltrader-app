@@ -41,7 +41,6 @@ async function editItemWindow(itemToLoad) {
     var eiw = document.getElementById("edititemwindow");
     var itemNameLabel = document.getElementById("edititem-name");
     var itemImage = document.getElementById("edititemimage");
-    var priceLabel = document.getElementById("editprice");
     var colorpicker = document.getElementById("colorpicker1");
 
     if(eiw.style.visibility == "visible") {
@@ -53,7 +52,10 @@ async function editItemWindow(itemToLoad) {
         });
         
         itemNameLabel.innerText = "Loading...";
+        itemImage.style.opacity = 0;
         itemImage.src = "";
+
+        document.getElementById("editprice").style.color = "black";
 
         var colorListItems = document.getElementsByClassName('editlistitem');
         for(var i = 0; i < colorListItems.length; i++) {
@@ -67,6 +69,8 @@ async function editItemWindow(itemToLoad) {
         document.getElementById("edit-pricespan1").value = "";
         document.getElementById("edit-pricespan2").value = "";
 
+        document.getElementById("edititembutton").removeAttribute("onclick");
+
     } else { //hidden
         //loading item info
         var colorbutton = document.getElementById("editcolorbutton");
@@ -75,9 +79,11 @@ async function editItemWindow(itemToLoad) {
         var itemSearch = itemName.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "")
         var cssColor = getKeyForItem(itemToLoad, "cssColor");
         var color = getKeyForItem(itemToLoad, "color")
+        var isFav = getKeyForItem(itemToLoad, "isFavorite");
 
         itemNameLabel.innerText = itemName;
         itemImage.src = getKeyForItem(itemToLoad, "itemImage");
+        itemImage.style.opacity = 1;
         itemImage.setAttribute("draggable", "false");
         document.getElementById("edit-title").innerText = "Loading Available Colors...";
         
@@ -86,7 +92,20 @@ async function editItemWindow(itemToLoad) {
         if(color == "white") {
             colorbutton.style.background = "#dbdbdb";
             colorbutton.style.color = "black";
+        } else {
+            colorbutton.style.color = "white";
         }
+
+        if(isFav) {
+            document.getElementById("editfav").style.backgroundColor = "rgb(0, 184, 148)";
+            document.getElementById("editfav-indicator").innerHTML = '<i class="fas fa-check"></i>';
+        } else {
+            document.getElementById("editfav").style.backgroundColor = "rgb(255, 107, 129)";
+            document.getElementById("editfav-indicator").innerHTML = '<i class="fas fa-times"></i>';
+
+        }
+
+        document.getElementById("edititembutton").setAttribute("onclick", "saveEditItem(" + itemToLoad + ")");
 
         document.querySelector("footer").style.zIndex = -1;
         eiw.style.visibility = "visible";

@@ -424,7 +424,49 @@ function startConfig(type) {
     }
 }
 
-var editPriceOption = 1;
+function saveEditItem(item) {
+    var willBeFav;
+    var newPrice = "";
+    if(document.getElementById("editfav").style.backgroundColor == "rgb(0, 184, 148)") {
+        willBeFav = true;
+    } else {
+        willBeFav = false;
+    }
+
+    if(document.getElementById("editpricelabel").innerText.includes("Price will be changed to:")) {
+        var editprice = document.getElementById("editprice");
+        if(editprice.innerText.includes("Cr")) {
+            if(!editprice.innerText.includes("-")) { //only one price
+                newPrice = editprice.innerText.replace(" Cr", "") + " - " + editprice.innerText.replace(" Cr", "");
+            } else {
+                newPrice = editprice.innerText.replace(" Cr", "");
+            }
+        } else if(editprice.innerText == "Enter a complete span") {
+            editprice.style.color = "red";
+        }
+    }
+
+    modifyKeyForItem(item, "isFavorite", willBeFav);
+    if(newPrice != "") modifyKeyForItem(item, "lastCreditPrice", newPrice);
+
+    selectedItems.forEach(itemId => {
+        document.getElementById("db-item-cb" + itemId).innerHTML = '<i class="far fa-square"></i>';
+        document.getElementById("db-item-cb" + itemId).style.opacity = 0;
+    });
+
+    selectItem("clear");
+    editItemWindow('')
+
+    document.getElementById('alertbox-span').innerHTML = "Item successfully edited";
+    $('.alertbox').css("background-color", "#2ecc71");
+    $('.alertbox').animate({ opacity: 1 }, "fast", function() {
+        setTimeout(function () {
+            $('.alertbox').animate({ opacity: 0 }, "fast");
+        }, 5000);
+    });
+}
+
+var editPriceOption = 1; //1 = dont do anything, 2 = reset to current, 3 = custom span
 
 function editPriceType(option) {
     var sameOption = false;
@@ -453,7 +495,7 @@ function editPriceType(option) {
                 break;
             case 3: //custom price span
                 document.getElementById("editpricelabel").innerHTML = document.getElementById("editpricelabel").innerHTML.replace("Price will not be changed", "Price will be changed to: ");
-                document.getElementById("editprice").innerText = "SPAN HERE";
+                document.getElementById("editprice").innerText = "Enter a complete span";
                 break;
             default:
                 break;
@@ -471,6 +513,41 @@ function editPriceType(option) {
     }
 
     editPriceOption = option;
+}
+
+function editPriceSpan() {
+    var span1 = document.getElementById("edit-pricespan1");
+    var span2 = document.getElementById("edit-pricespan2");
+    var editPriceLabel = document.getElementById("editprice")
+
+    var spanVal1 = Math.round(parseInt(span1.value) / 10) * 10;
+    var spanVal2 = Math.round(parseInt(span2.value) / 10) * 10;
+
+    if(spanVal1 == 0) spanVal1 = 10;
+    if(spanVal2 == 0) spanVal2 = 10;
+
+    if(span1.value == "" || span2.value == "") {
+        editPriceLabel.innerText = "Enter a complete span";
+    } else {
+        if(spanVal1 == spanVal2) {
+            editPriceLabel.innerText = spanVal1 + " Cr";
+        } else if(spanVal1 > spanVal2) {
+            editPriceLabel.innerText = spanVal2 + " - " + spanVal1 + " Cr";
+        } else {
+            editPriceLabel.innerText = spanVal1 + " - " + spanVal2 + " Cr";
+        }
+    }
+}
+
+function editFav() {
+    if(document.getElementById("editfav").style.backgroundColor == "rgb(0, 184, 148)") { //yes
+        document.getElementById("editfav").style.backgroundColor = "rgb(255, 107, 129)"; //red
+        document.getElementById("editfav-indicator").innerHTML = '<i class="fas fa-times"></i>';
+    } else { //no
+        document.getElementById("editfav").style.backgroundColor = "rgb(0, 184, 148)"; //red
+        document.getElementById("editfav-indicator").innerHTML = '<i class="fas fa-check"></i>';
+    }
+
 }
 
 function colorPicker(number) {

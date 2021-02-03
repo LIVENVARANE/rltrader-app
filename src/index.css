@@ -216,7 +216,7 @@ header i {
 }
 
 #edititemwindow #edititemimage {
-    border-radius: 3px;
+    border-radius: 3px 3px 0px 0px;;
     margin-right: 20px;
     width: 100px;
 }
@@ -225,7 +225,7 @@ header i {
     background-color: white;
     border-radius: 10px;
     width: 560px;
-    height: 540px;
+    height: 610px;
     padding: 10px;
     cursor: default;
     border-bottom: 3px solid grey;
@@ -243,6 +243,20 @@ header i {
     left: 120px;
     font-weight: normal;
     display: inline;
+}
+
+#edititemwindow #edititem-page #editfav {
+    background-color: rgb(255, 107, 129);
+    color: white;
+    text-align: center;
+    padding: 5px 0px;
+    width: 100px;
+    position: relative;
+    top: -34px;
+    border-radius: 0px 0px 7px 7px;
+    cursor: pointer;
+
+    transition: 0.2s ease-in;
 }
 
 #edititemwindow #edititem-page .close {
@@ -358,6 +372,22 @@ header i {
     padding: 3px 10px;
     font-family: 'Ubuntu', sans-serif;
     border: 1px solid #3B3B58;
+
+    transition: 0.3s ease-out border;
+}
+
+#edititemwindow #edititem-page .edit-ie-footer .editpricecontainer #price-right input:hover {
+    border: 1px solid #A96DA3;
+}
+
+#edititemwindow #edititem-page .edit-ie-footer .editpricecontainer #price-right input:focus {
+    border: 1px solid #A96DA3;
+}
+
+#edititemwindow #edititem-page .edit-ie-footer .editpricecontainer #price-right input[type=number]::-webkit-inner-spin-button, 
+#edititemwindow #edititem-page .edit-ie-footer .editpricecontainer #price-right input[type=number]::-webkit-outer-spin-button { 
+    appearance: none;
+    margin: 0; 
 }
 
 #edititemwindow #edititem-page .edit-ie-footer .editpricecontainer .separator {
@@ -378,7 +408,7 @@ header i {
 }
 
 
-#edititemwindow #edititem-page .edit-ie-footer .edititembutton {
+#edititemwindow #edititem-page .edit-ie-footer #edititembutton {
     background: linear-gradient(to right, #7A5980, #3B3B58);
     font-weight: bold;
     color: white;
@@ -393,7 +423,7 @@ header i {
     transition: ease-out 0.5s border-radius;
 }
 
-#edititemwindow #edititem-page .edit-ie-footer .edititembutton:hover {
+#edititemwindow #edititem-page .edit-ie-footer #edititembutton:hover {
     border-radius: 25px;
 }
 
@@ -549,6 +579,9 @@ header i {
     border-radius: 3px;
     margin-right: 20px;
     width: 100px;
+    opacity: 0;
+
+    transition: 0.2s ease;
 }
 
 #additemwindow #iteminfo h2 {

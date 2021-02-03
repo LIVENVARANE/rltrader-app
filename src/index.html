@@ -124,6 +124,7 @@
                         <li id="cp1-default" class="editlistitem" style="background-color: rgb(49, 49, 49); color: white;">Default</li>
                         <li style="text-align: center; display: list-item; border-radius: 0px 0px 5px 5px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9);" onclick="colorPicker('1');"><u>Close</u></li>
                     </div><br />
+                    <div id="editfav" onclick="editFav()">Favorite: <span id="editfav-indicator"><i class="fas fa-times"></i></span></div>
                     <div class="edit-ie-footer">
                         <div class="separator"></div>
                         <h2>Edit price</h2>
@@ -138,14 +139,14 @@
                             <div id="price-right" style="opacity: 0.5;">
                                 <div align="center" style="position: relative; top: -25px;">
                                     <h3 style="color: #3B3B58;">Set a price range</h3>
-                                    <input type="text" disabled id="edit-pricespan1" style="border-radius: 100px 50px 50px 100px;" /><span> to </span><input type="text" disabled id="edit-pricespan2" style="border-radius: 50px 100px 100px 50px;" />
+                                    <input type="number" step="10" disabled id="edit-pricespan1" onchange="editPriceSpan()" style="border-radius: 100px 50px 50px 100px;" /><span> to </span><input type="number"step="10"  disabled id="edit-pricespan2" onchange="editPriceSpan()" style="border-radius: 50px 100px 100px 50px;" />
                                 </div>
                             </div>
                         </div>
                         <h4 id="editpricelabel">Price will be changed to: <span id="editprice">Loading...</span></h4>
                         <div align="center">
                             <div class="cancel-edititembutton" onclick="editItemWindow('')">CANCEL</div>
-                            <div class="edititembutton">SAVE</div>
+                            <div id="edititembutton">SAVE</div>
                         </div>
                     </div>
                 </div>
