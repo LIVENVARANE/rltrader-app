@@ -165,3 +165,18 @@ function toggleToolbar() {
         $("#f-username").animate({ top: "-34px" }, "fast");
     }
 }
+
+function navSettings(page) {
+    $("#settings-content").children('div').each(function () {
+        var item = document.getElementById($(this).attr('id'));
+        if(item.id.includes("s-")) {
+            item.style.display = "none";
+            item.style.opacity = 0;
+        }
+    });
+
+    var pageDiv = document.getElementById("s-" + page);
+
+    pageDiv.style.display = "block";
+    $("#s-" + page).animate({ opacity: 1 }, "fast");
+}

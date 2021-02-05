@@ -81,14 +81,14 @@
             <div id="settings-page"><i class="fas fa-times close" onclick="settingsWindow()"></i>
                 <div class="navbar">
                     <h2>Settings</h2>
-                    <span><a><i class="fas fa-cogs"></i> General</a></span>
-                    <span><a><i class="fas fa-user-circle"></i> Account</a></span>
-                    <span><a><i class="fas fa-home"></i> Dashboard</a></span>
-                    <span><a><i class="fas fa-toolbox"></i> Toolbar</a></span>
-                    <span><a><i class="fas fa-star"></i> Credits</a></span>
+                    <span onclick="navSettings('general')"><a><i class="fas fa-cogs"></i> General</a></span>
+                    <span onclick="navSettings('account')"><a><i class="fas fa-user-circle"></i> Account</a></span>
+                    <span onclick="navSettings('dashboard')"><a><i class="fas fa-home"></i> Dashboard</a></span>
+                    <span onclick="navSettings('toolbar')"><a><i class="fas fa-toolbox"></i> Toolbar</a></span>
+                    <span onclick="navSettings('credits')"><a><i class="fas fa-star"></i> Credits</a></span>
                 </div>
-                <div class="content">
-                    <div id="s-general">
+                <div class="content" id="settings-content">
+                    <div id="s-general" style="display: block;">
                         <h2>General settings</h2>
                         <br />
                         <h3>Language: 
@@ -96,6 +96,27 @@
                                 <option value="eng">English</option>
                             </select>
                         </h3>
+                    </div>
+                    <div id="s-account" style="display: none;">
+                        <h2>Account settings</h2>
+                    </div>
+                    <div id="s-dashboard" style="display: none;">
+                        <h2>Dashboard settings</h2>
+                    </div>
+                    <div id="s-toolbar" style="display: none;">
+                        <h2>Toolbar settings</h2>
+                    </div>
+                    <div id="s-credits" style="display: none;">
+                        <h2>Credits</h2>
+                        <br />
+                        <h5>Thank you for using RLTrader !<br />This software has been made entierly by LIVEN (with love).<br />All the items prices and informations are from RLInsider and all Rocket League material belongs to Psyonix, Inc and RLTrader have no rights to the game Rocket League.<br /><br />Thanks !</h5>
+                        <h3>Links</h3>
+                        <ul>
+                            <li><a title="Not done yet." style="cursor: not-allowed;">RLTrader website</a></li>
+                            <li><a href="https://rl.insider.gg/">RLInsider website</a></li>
+                            <li><a href="https://github.com/LIVENVARANE/rltrader-app">RLTrader GitHub page</a></li>
+                            <li><a href="https://twitter.com/LivenOff">LIVEN's Twitter Account</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>

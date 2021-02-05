@@ -200,10 +200,38 @@ header i {
     margin: 0px 0px 10px 13%;
 }
 
+#settingswindow #settings-page .content h5 {
+    font-weight: normal;
+    text-align: left;
+    padding: 0px 40px;
+    text-align: center;
+    color: #777777;
+}
+
 #settingswindow #settings-page .content select {
     outline: none;
     padding: 3px 20px 3px 5px;
     border-radius: 10px;
+}
+
+#settingswindow #settings-page .content ul {
+    text-align: left;
+    margin-left: 20px;
+    color: #777777;
+}
+
+#settingswindow #settings-page .content a {
+    text-decoration: none;
+    color: #A96DA3;
+    font-weight: bold;
+    position: relative;
+    left: 0px;
+
+    transition: 0.2s ease-out left;
+}
+
+#settingswindow #settings-page .content a:hover {
+    left: 10px;
 }
 
 #edititemwindow {
