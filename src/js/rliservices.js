@@ -11,7 +11,6 @@ async function searchForItem() {
     var typeLabel = document.getElementById('type');
     var aiwLoadingWheel = document.getElementById('aiw-loading');
     var priceLabel = document.getElementById('price');
-    var alertspan = document.getElementById('alertbox-span');
 
     colorpicker.style.visibility = "hidden";
     iteminfo.style.visibility = "hidden";
@@ -120,13 +119,7 @@ async function searchForItem() {
     availableColors = availableColors.replaceAll(" no", ""); //we get all the colors that exists for that item
 
     if(availableColors == "") {
-        document.getElementById('alertbox-span').innerHTML = "This item does not exist or it is not tradeable, make sure you typed the name correctly.";
-                $('.alertbox').css("background-color", "#e74c3c");
-                $('.alertbox').animate({ opacity: 1 }, "fast", function() {
-                    setTimeout(function () {
-                        $('.alertbox').animate({ opacity: 0 }, "fast");
-                    }, 5000);
-                });
+        showAlert("This item does not exist or it is not tradeable, make sure you typed the name correctly.", "#e74c3c");
         aiwLoadingWheel.style.visibility = "hidden";
     } else {
         var stockAC = availableColors.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue").substring(1);
@@ -271,12 +264,7 @@ async function searchForItem() {
                 colorbutton.style.color = "white";
                 var price = "Please select a color";
                 if(itemcolor != "") { //the user specified a color but it does not exists
-                    alertspan.innerHTML = "The color you specified does not exists for this item.";
-                    $('.alertbox').animate({ opacity: 1 }, "fast", function() {
-                        setTimeout(function () {
-                            $('.alertbox').animate({ opacity: 0 }, "fast");
-                        }, 5000);
-                    });
+                    showAlert("The color you specified does not exists for this item." , "#e74c3c")
                 }
             }
         }

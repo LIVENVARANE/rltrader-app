@@ -171,13 +171,7 @@ function doItemAction(type) {
                 });
                 var isMult = "";
                 if(selectedItems.length >= 2) isMult = "s";
-                document.getElementById('alertbox-span').innerHTML = "Item" + isMult + " added/removed from favorites";
-                $('.alertbox').css("background-color", "#2ecc71");
-                $('.alertbox').animate({ opacity: 1 }, "fast", function() {
-                    setTimeout(function () {
-                        $('.alertbox').animate({ opacity: 0 }, "fast");
-                    }, 5000);
-                });
+                showAlert("Item" + isMult + " added/removed from favorites", "#2ecc71");
                 selectItem("clear");
                 break;
             case "del":
@@ -195,13 +189,7 @@ function doItemAction(type) {
                 });
                 selectItem("clear");
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
-                document.getElementById('alertbox-span').innerHTML = "Item removed from your inventory";
-                $('.alertbox').css("background-color", "#2ecc71");
-                $('.alertbox').animate({ opacity: 1 }, "fast", function() {
-                    setTimeout(function () {
-                        $('.alertbox').animate({ opacity: 0 }, "fast");
-                    }, 5000);
-                });
+                showAlert("Item removed from your inventory", "#2ecc71");
                 break;
             case "dup":
                 
@@ -517,15 +505,8 @@ function saveEditItem(item) {
     });
 
     selectItem("clear");
-    editItemWindow('')
-
-    document.getElementById('alertbox-span').innerHTML = "Item successfully edited";
-    $('.alertbox').css("background-color", "#2ecc71");
-    $('.alertbox').animate({ opacity: 1 }, "fast", function() {
-        setTimeout(function () {
-            $('.alertbox').animate({ opacity: 0 }, "fast");
-        }, 5000);
-    });
+    editItemWindow('');
+    showAlert("Item successfully edited", "#2ecc71");
 }
 
 var editPriceOption = 1; //1 = dont do anything, 2 = reset to current, 3 = custom span
@@ -729,7 +710,7 @@ async function selectColor(color, alternate) {
             colorbutton.style.color = "white";
             break;
         default:
-            alert("An error hapenned, please restart RLTrader. Error code: WCSCF");
+            showAlert("An error hapenned, please restart RLTrader. Error code: WCSCF", "#e74c3c");
             return;
     }
 
@@ -832,13 +813,7 @@ function addItemToInventory() {
                     }, 500);
                 });
 
-                document.getElementById('alertbox-span').innerHTML = "Item added to your inventory";
-                $('.alertbox').css("background-color", "#2ecc71");
-                $('.alertbox').animate({ opacity: 1 }, "fast", function() {
-                    setTimeout(function () {
-                        $('.alertbox').animate({ opacity: 0 }, "fast");
-                    }, 5000);
-                });
+                showAlert("Item added to your inventory", "#2ecc71");
             } else {
                 alert("An error happened, please contact an administrator. Error code: NFPAI");
             }
@@ -920,4 +895,14 @@ function changeInventorySortingType() {
             $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
         });
     }
+}
+
+function showAlert(text, backgroundColor) {
+    document.getElementById('alertbox-span').innerHTML = text;
+    $('.alertbox').css("background-color", backgroundColor);
+    $('.alertbox').animate({ opacity: 1 }, "fast", function() {
+        setTimeout(function () {
+            $('.alertbox').animate({ opacity: 0 }, "fast");
+        }, 5000);
+    });
 }
