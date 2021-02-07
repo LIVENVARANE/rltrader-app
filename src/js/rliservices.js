@@ -120,7 +120,13 @@ async function searchForItem() {
     availableColors = availableColors.replaceAll(" no", ""); //we get all the colors that exists for that item
 
     if(availableColors == "") {
-        alert("This item does not exist or it is not tradeable, make sure you typed the name correctly.");
+        document.getElementById('alertbox-span').innerHTML = "This item does not exist or it is not tradeable, make sure you typed the name correctly.";
+                $('.alertbox').css("background-color", "#e74c3c");
+                $('.alertbox').animate({ opacity: 1 }, "fast", function() {
+                    setTimeout(function () {
+                        $('.alertbox').animate({ opacity: 0 }, "fast");
+                    }, 5000);
+                });
         aiwLoadingWheel.style.visibility = "hidden";
     } else {
         var stockAC = availableColors.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue").substring(1);
@@ -181,6 +187,7 @@ async function searchForItem() {
         $("#iteminfo").animate({ opacity: 1 }, "fast");
         itemimage.src = itemPicURL;
         itemimage.setAttribute("draggable", "false");
+        itemimage.style.opacity = 1;
         itemnameLabel.innerHTML = decalCar + itemname + specialEditionName;
         rarityLabel.innerHTML = "Rarity: " + rarity;
         typeLabel.innerHTML = "Type: " + type;

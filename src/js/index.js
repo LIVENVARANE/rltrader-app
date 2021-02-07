@@ -1,6 +1,6 @@
 const electron = require("electron");
 const fs = require("fs");
-const { resolve } = require("path");
+const { shell } = require('electron');
 
 function pageLoad() {
     const dataFolderPath = (electron.app || electron.remote.app).getPath('userData');
@@ -43,6 +43,9 @@ function pageLoad() {
                     var itemDiv = document.createElement('div');
                     itemDiv.className = "item";
                     itemDiv.style.borderTop = "2px solid " + item.cssColor;
+                    if(!userDataContent.settings.dashboardItemBorderColor) {
+                        itemDiv.style.borderWidth = "0px";
+                    }
                     itemDiv.align = "left";
                     itemDiv.id = "db-item" + item.id;
                     itemDiv.setAttribute("onclick", "selectItem(" + item.id + ")")
@@ -68,7 +71,7 @@ function pageLoad() {
                     itemColor.innerHTML = item.displayColor;
                     itemColor.className = "itemcolor";
                     itemColor.style.backgroundColor = item.cssColor;
-                    if(item.color == "white") {
+                    if(item.color == "white" || item.color == "saffron") {
                         itemColor.style.color = "black";
                     }
                     infoDiv.appendChild(itemColor);
@@ -101,9 +104,18 @@ function pageLoad() {
                                 bringItemToFront(parseInt(itemId.replace("db-item", "")));
                             }
                         });
-                        console.log("Saved order changes for inventory")
+                        console.log("Saved order changes for inventory");
                     }
                 })
+
+                //some startup settings
+                if(userDataContent.settings.hideToolbarAtStartupSetting) {
+                    toggleToolbar();
+                }
+                if(!userDataContent.settings.headerAnimationSetting) {
+                    document.getElementById("header-span-anim").style.opacity = 0;
+                    document.getElementById("header-span-noanim").style.opacity = 1;
+                }
             }
         } else {
             console.log("File userdata.json not found, creating one..");
@@ -414,6 +426,7 @@ function startConfig(type) {
             userDataContent.didFirstConnect = 1;
             userDataContent.username = username_field.value;
             userDataContent.inventory = [];
+            userDataContent.settings = {};
             
             fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
 
@@ -431,6 +444,55 @@ function saveEditItem(item) {
         willBeFav = true;
     } else {
         willBeFav = false;
+    }
+
+    modifyKeyForItem(item, "displayColor", document.getElementById("editcolorbutton").innerText);
+    modifyKeyForItem(item, "itemImage", document.getElementById("edititemimage").src);
+    modifyKeyForItem(item, "cssColor", document.getElementById("editcolorbutton").style.backgroundColor);
+    
+    switch(document.getElementById("editcolorbutton").innerText) {
+        case "Black":
+            modifyKeyForItem(item, "color", "black");
+            break;
+        case "Titanium White":
+            modifyKeyForItem(item, "color", "white");
+            break;
+        case "Grey":
+            modifyKeyForItem(item, "color", "grey");
+            break;
+        case "Crimson":
+            modifyKeyForItem(item, "color", "crimson");
+            break;
+        case "Pink":
+            modifyKeyForItem(item, "color", "pink");
+            break;
+        case "Cobalt":
+            modifyKeyForItem(item, "color", "cobalt");
+            break;
+        case "Sky Blue":
+            modifyKeyForItem(item, "color", "sblue");
+            break;
+        case "Burnt Sienna":
+            modifyKeyForItem(item, "color", "sienna");
+            break;
+        case "Saffron":
+            modifyKeyForItem(item, "color", "saffron");
+            break;
+        case "Lime":
+            modifyKeyForItem(item, "color", "lime");
+            break;
+        case "Forest Green":
+            modifyKeyForItem(item, "color", "fgreen");
+            break;
+        case "Orange":
+            modifyKeyForItem(item, "color", "orange");
+            break;
+        case "Purple":
+            modifyKeyForItem(item, "color", "purple");
+            break;
+        default:
+            modifyKeyForItem(item, "color", "");
+            break;
     }
 
     if(document.getElementById("editpricelabel").innerText.includes("Price will be changed to:")) {
@@ -468,7 +530,7 @@ function saveEditItem(item) {
 
 var editPriceOption = 1; //1 = dont do anything, 2 = reset to current, 3 = custom span
 
-function editPriceType(option) {
+async function editPriceType(option) {
     var sameOption = false;
     for (var i = 1; i < 4 ; i++) {
         var radio = document.getElementById("price-radio" + i);
@@ -490,8 +552,17 @@ function editPriceType(option) {
                 break;
             case 2: //reset to current price
                 document.getElementById("editpricelabel").innerHTML = document.getElementById("editpricelabel").innerHTML.replace("Price will not be changed", "Price will be changed to: ");
-                document.getElementById("editprice").innerText = "Loading...";
-                selectColor(document.getElementById("editcolorbutton").innerText.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue"), "edit")
+                document.getElementById("editprice").innerText = "Loading...";               
+                var color = document.getElementById("editcolorbutton").innerText.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue");
+
+                if(color == "default") {
+                    var itemPrice = await doItemRequest(document.getElementById("edititem-name").innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
+                } else {
+                    var itemPrice = await doItemRequest(document.getElementById("edititem-name").innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
+                }
+
+                document.getElementById("editprice").innerText = itemPrice;
+                
                 break;
             case 3: //custom price span
                 document.getElementById("editpricelabel").innerHTML = document.getElementById("editpricelabel").innerHTML.replace("Price will not be changed", "Price will be changed to: ");
@@ -571,7 +642,6 @@ async function selectColor(color, alternate) {
     
     var itemnameLabel = document.getElementById(alternate + 'item-name');
     var itemImage = document.getElementById(alternate + 'itemimage');
-    var stop = false;
 
     $("#" + alternate +"itemimage").animate({ opacity: 0 }, "fast");
     var itemNameSearch = itemnameLabel.innerText.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
@@ -586,7 +656,7 @@ async function selectColor(color, alternate) {
         fs.writeFileSync(userDataPath, JSON.stringify(errorLogsContent, null, 4));
     }
 
-    $("#" + alternate +"itemimage").animate({ opacity: 1 }, "fast");
+        $("#" + alternate +"itemimage").animate({ opacity: 1 }, "fast");
     switch(color) {
         case "black":
             colorbutton.innerHTML = "Black";
@@ -673,13 +743,16 @@ async function selectColor(color, alternate) {
     } else {
         var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
     }
+    if(alternate == "edit") {
+        editPriceType(2);
+    }
     if(alternate != "" && editPriceOption != 2) return;
     priceLabel.innerHTML = itemPrice.replace("yet. Cr", "yet.").replace("no Cr", "Error");
     if(priceLabel.innerHTML.includes("Error")) {
         var errorLogsPath = (electron.app || electron.remote.app).getPath('userData') + "/data/errorlogs.json";
         var errorLogsContent = JSON.parse(fs.readFileSync(errorLogsPath, 'utf-8').toString());
         errorLogsContent.errorlogs.push({"Function":"SelectColor","Reason":"Getting price","Log":itemPrice});
-        fs.writeFileSync(userDataPath, JSON.stringify(errorLogsContent, null, 4));
+        fs.writeFileSync(errorLogsPath, JSON.stringify(errorLogsContent, null, 4));
     }
 }
 
@@ -772,5 +845,79 @@ function addItemToInventory() {
         } else {
             colorbutton.style.color = "red";
         }
+    }
+}
+
+function settingsCheckbox(id) {
+    var checkbox = document.getElementById(id);
+
+    if(checkbox.style.backgroundColor == "rgb(0, 184, 148)") {  //will be disabled
+        checkbox.style.backgroundColor = "rgb(255, 107, 129)";
+        checkbox.innerHTML = 'Disabled<i class="fas fa-times"></i>';
+        setSettingValue(id, false);
+    } else { //will be enabled
+        checkbox.style.backgroundColor = "rgb(0, 184, 148)";
+        checkbox.innerHTML = 'Enabled<i class="fas fa-check"></i>';
+        setSettingValue(id, true);
+    }
+}
+
+function getSettingValue(setting) {
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+
+    return userDataContent.settings[setting];
+}
+
+function setSettingValue(setting, value) {
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+    userDataContent.settings[setting] = value;
+    fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+    console.log("Settings updated.")
+
+    //applying changes live
+    switch(setting) {
+        case "headerAnimationSetting":
+            if(value) {
+                $("#header-span-anim").animate({ opacity: 1 }, "fast", function() {
+                    document.getElementById("header-span-noanim").style.opacity = 0;
+                });
+            } else {
+                document.getElementById("header-span-anim").style.opacity = 0;
+                document.getElementById("header-span-noanim").style.opacity = 1;
+            }
+            break;
+        case "dashboardItemBorderColor":
+            $('#inv-container').children('div').each(function () {
+                var itemId = $(this).attr('id');
+                if(document.getElementById(itemId).id.includes("db-item")) {
+                    if(value) document.getElementById(itemId).style.borderWidth = "2px";
+                    else document.getElementById(itemId).style.borderWidth = "0px";
+                }
+            });
+            break;
+        case "autoHideToolbarSetting":
+            //TODO
+            break;
+        default:
+            break;
+    }
+}
+
+function changeInventorySortingType() {
+    var sortingTypeIcon = document.getElementById("sorting-type-icon");
+
+    if(sortingTypeIcon.className == "fas fa-th-large") { //bubbles mode
+        $("#sorting-type-icon").animate({ opacity: 0 }, "fast", function() {
+            sortingTypeIcon.className = "fas fa-th-list";
+            $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
+        });
+        
+    } else { //list mode
+        $("#sorting-type-icon").animate({ opacity: 0 }, "fast", function() {
+            sortingTypeIcon.className = "fas fa-th-large";
+            $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
+        });
     }
 }

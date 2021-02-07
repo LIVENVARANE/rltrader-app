@@ -11,6 +11,7 @@ function addItemWindow() {
             }, 100);
         });
     } else { //hidden
+        document.getElementById("itemsearch").value = "";
         document.querySelector("footer").style.zIndex = -1;
         aiw.style.visibility = "visible";
         aiw.style.opacity = 0;
@@ -30,6 +31,32 @@ function settingsWindow() {
             }, 100);
         });
     } else { //hidden
+        navSettings('general');
+
+        var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+        var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());    
+        if(Object.keys(userDataContent.settings).length == 0) { //set default settings here
+            setSettingValue("language", "eng");
+            setSettingValue("headerAnimationSetting", true);
+            setSettingValue("dashboardItemBorderColor", true);
+            setSettingValue("hideToolbarAtStartupSetting", false);
+            setSettingValue("autoHideToolbarSetting", false);
+        }
+
+        Object.keys(userDataContent.settings).forEach(setting => {
+            var value = getSettingValue(setting);
+            //every checkboxes
+            if(setting == "hideToolbarAtStartupSetting" || setting == "autoHideToolbarSetting" || setting == "headerAnimationSetting" || setting == "dashboardItemBorderColor") {
+                var settingObj = document.getElementById(setting);
+                if(value) {
+                    settingObj.style.backgroundColor = "rgb(0, 184, 148)";
+                    settingObj.innerHTML = 'Enabled<i class="fas fa-check"></i>';
+                } else {
+                    settingObj.style.backgroundColor = "rgb(255, 107, 129)";
+                    settingObj.innerHTML = 'Disabled<i class="fas fa-times"></i>';
+                }
+            }
+        });
         document.querySelector("footer").style.zIndex = -1;
         sw.style.visibility = "visible";
         sw.style.opacity = 0;
@@ -91,6 +118,8 @@ async function editItemWindow(itemToLoad) {
         colorbutton.innerText = getKeyForItem(itemToLoad, "displayColor");
         if(color == "white") {
             colorbutton.style.background = "#dbdbdb";
+            colorbutton.style.color = "black";
+        } else if(color == "saffron") {
             colorbutton.style.color = "black";
         } else {
             colorbutton.style.color = "white";
@@ -167,16 +196,15 @@ function toggleToolbar() {
 }
 
 function navSettings(page) {
-    $("#settings-content").children('div').each(function () {
-        var item = document.getElementById($(this).attr('id'));
-        if(item.id.includes("s-")) {
-            item.style.display = "none";
-            item.style.opacity = 0;
-        }
-    });
-
-    var pageDiv = document.getElementById("s-" + page);
-
-    pageDiv.style.display = "block";
-    $("#s-" + page).animate({ opacity: 1 }, "fast");
+    if(document.getElementById("s-" + page).style.display != "block") {
+        $("#settings-content").children('div').each(function () {
+            var item = document.getElementById($(this).attr('id'));
+            if(item.id.includes("s-")) {
+                item.style.display = "none";
+                item.style.opacity = 0;
+            }
+        });
+        document.getElementById("s-" + page).style.display = "block";
+        $("#s-" + page).animate({ opacity: 1 }, "fast");
+    }
 }

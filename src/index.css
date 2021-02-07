@@ -41,8 +41,20 @@ header img {
     top: calc(50% - 20px);
 }
 
+header .settings-btn {
+    transform: rotate(0turn);
+    opacity: 1;
+    font-size: 23px;
+    top: 0px;
 
-header span {
+    transition: 0.3s transform;
+}
+
+header .settings-btn:hover {
+    transform: rotate(0.25turn);
+}
+
+#header-span-anim {
     font-weight: bold;
     font-size: 28px;
     position: relative;
@@ -56,7 +68,22 @@ header span {
     width: fit-content;
 }
 
-header span::before {
+#header-span-noanim {
+    font-weight: bold;
+    font-size: 28px;
+    position: relative;
+    top: calc(50% - 18px);
+    left: -130px;
+    margin-left: 7px;
+    color: white;
+
+    overflow: hidden;
+    line-height: 1.2;
+    display: inline-block;
+    width: fit-content;
+}
+
+#header-span-anim::before {
     content: '';
     position: absolute;
     top: 0;
@@ -68,7 +95,7 @@ header span::before {
     transform: translateX(0);
 }
 
-header span::after {
+#header-span-anim::after {
     content: '';
     position: absolute;
     top: 0;
@@ -80,13 +107,13 @@ header span::after {
     transform: translateX(-101%);
 }
 
-header span:nth-of-type(1)::before,
-header span:nth-of-type(1)::after{
+#header-span-anim:nth-of-type(1)::before,
+#header-span-anim:nth-of-type(1)::after{
     animation-delay: 1s;
 }
 
-header span:nth-of-type(2)::before,
-header span:nth-of-type(2)::after{
+#header-span-anim:nth-of-type(2)::before,
+#header-span-anim:nth-of-type(2)::after{
     animation-delay: 1.5s;
 }
 
@@ -104,12 +131,21 @@ header span:nth-of-type(2)::after{
 
 header i {
     text-align: right;
+    opacity: 0.8;
     color: white;
-    font-size: 23px;
-    position: absolute;
-    right: 18px;
-    top: 18px;
+    font-size: 21px;
     cursor: pointer;
+    float: right;
+    margin: 18px 7px;
+    position: relative;
+    left: 10px;
+    top: 2px;
+
+    transition: 0.2s ease-out opacity;
+}
+
+header i:hover {
+    opacity: 1;
 }
 
 #settingswindow {
@@ -136,7 +172,9 @@ header i {
 #settingswindow #settings-page .close {
     position: absolute;
     color: #7A5980;
-    right: 15px;
+    right: 5px;
+    top: 3px;
+    padding: 10px;
     font-size: 18px;
     cursor: pointer;
     z-index: 999;
@@ -226,12 +264,35 @@ header i {
     font-weight: bold;
     position: relative;
     left: 0px;
+    cursor: pointer;
 
     transition: 0.2s ease-out left;
 }
 
 #settingswindow #settings-page .content a:hover {
     left: 10px;
+}
+
+#settingswindow #settings-page .content .checkbox {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: rgb(255, 107, 129);
+    color: white;
+    cursor: pointer;
+    line-height: 1;
+
+    transition: 0.2s ease-in;
+}
+
+#settingswindow #settings-page .content .checkbox:hover {
+    border-radius: 10px;
+}
+
+#settingswindow #settings-page .content .checkbox i {
+    margin-left: 5px;
+    position: relative;
+    top: 1px;
 }
 
 #edititemwindow {
@@ -290,7 +351,9 @@ header i {
 #edititemwindow #edititem-page .close {
     position: absolute;
     color: #7A5980;
-    right: 15px;
+    right: 5px;
+    top: 3px;
+    padding: 10px;
     font-size: 18px;
     cursor: pointer;
     z-index: 999;
@@ -523,6 +586,7 @@ header i {
     border-bottom: 3px solid gray;
     border-radius: 10px 0px 0px 10px;
     cursor: pointer;
+    color: #3B3B58;
 }
 
 #additemwindow .aiw-container .close:hover {
@@ -547,6 +611,7 @@ header i {
     border-bottom: 3px solid gray;
     border-radius: 0px 10px 10px 0px;
     cursor: pointer;
+    color: #3B3B58;
 }
 
 #additemwindow .aiw-container .search:hover {
@@ -608,8 +673,6 @@ header i {
     margin-right: 20px;
     width: 100px;
     opacity: 0;
-
-    transition: 0.2s ease;
 }
 
 #additemwindow #iteminfo h2 {
@@ -840,13 +903,14 @@ footer .f-action {
 }
 
 footer .f-white {
-    color: white !important;
-    margin: 0px 25px;
-    cursor: default !important;
+    height: 54px;
+    padding: 26px 25px 0px 25px;
+    cursor: pointer;
+    color: white;
+    margin: 0px !important;
 }
 
 footer .f-white i {
-    cursor: pointer;
     position: relative;
     top: 0px;
 }

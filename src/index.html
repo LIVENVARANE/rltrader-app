@@ -28,15 +28,18 @@
     <body>
         <header>
             <img src="assets/ball-little.png"/>
-            <span>RLTrader</span>
-            <i class="fas fa-cog" onclick="settingsWindow()"></i>
+            <span id="header-span-anim" style="opacity: 1;">RLTrader</span>
+            <span id="header-span-noanim" style="opacity: 0;">RLTrader</span>
+            <i class="fas fa-cog settings-btn" onclick="settingsWindow()"></i>
+            <i class="fas fa-th-large" id="sorting-type-icon" onclick="changeInventorySortingType()"></i>
+            <i class="far fa-star" id="favorite-sorting-icon"></i>
         </header>
         <div align="center">
             <div id="inv-container"></div>
             <div class="bottom-gradient"></div>
         </div>
     </body>
-    <div align="center">
+    <div align="center" id="windows-container">
         <div id="additemwindow" style="visibility: hidden;">
             <div class="aiw-container">
                 <div onclick="addItemWindow()" class="close"><i class="fas fa-times"></i></div>
@@ -96,26 +99,32 @@
                                 <option value="eng">English</option>
                             </select>
                         </h3>
+                        <h3>RLTrader animation: <div class="checkbox" id="headerAnimationSetting" onclick="settingsCheckbox('headerAnimationSetting')">Error<i class="fas fa-times"></i></div></h3>
                     </div>
                     <div id="s-account" style="display: none;">
                         <h2>Account settings</h2>
                     </div>
                     <div id="s-dashboard" style="display: none;">
                         <h2>Dashboard settings</h2>
+                        <br />
+                        <h3>Item border color <div class="checkbox" id="dashboardItemBorderColor" onclick="settingsCheckbox('dashboardItemBorderColor')">Error<i class="fas fa-times"></i></div></h3>
                     </div>
                     <div id="s-toolbar" style="display: none;">
                         <h2>Toolbar settings</h2>
+                        <br />
+                        <h3>Hide toolbar at startup: <div class="checkbox" id="hideToolbarAtStartupSetting" onclick="settingsCheckbox('hideToolbarAtStartupSetting')">Error<i class="fas fa-times"></i></div></h3>
+                        <h3>Auto hide toolbar: <div class="checkbox" id="autoHideToolbarSetting" onclick="settingsCheckbox('autoHideToolbarSetting')">Error<i class="fas fa-times"></i></div></h3>
                     </div>
                     <div id="s-credits" style="display: none;">
                         <h2>Credits</h2>
                         <br />
-                        <h5>Thank you for using RLTrader !<br />This software has been made entierly by LIVEN (with love).<br />All the items prices and informations are from RLInsider and all Rocket League material belongs to Psyonix, Inc and RLTrader have no rights to the game Rocket League.<br /><br />Thanks !</h5>
+                        <h5>Thank you for using RLTrader !<br />This software has entierly been made by LIVEN (with love).<br />All the items prices and informations are from and belongs to RLInsider and all Rocket League material belongs to Psyonix, Inc. RLTrader have no rights to the game Rocket League and the website RLInsider.<br /><br />Thanks !</h5>
                         <h3>Links</h3>
                         <ul>
                             <li><a title="Not done yet." style="cursor: not-allowed;">RLTrader website</a></li>
-                            <li><a href="https://rl.insider.gg/">RLInsider website</a></li>
-                            <li><a href="https://github.com/LIVENVARANE/rltrader-app">RLTrader GitHub page</a></li>
-                            <li><a href="https://twitter.com/LivenOff">LIVEN's Twitter Account</a></li>
+                            <li><a onclick="shell.openExternal('https://rl.insider.gg/')">RLInsider website</a></li>
+                            <li><a onclick="shell.openExternal('https://github.com/LIVENVARANE/rltrader-app')">RLTrader GitHub page</a></li>
+                            <li><a onclick="shell.openExternal('https://twitter.com/LivenOff')">LIVEN's Twitter Account</a></li>
                         </ul>
                     </div>
                 </div>
@@ -186,7 +195,7 @@
             <div class="separator"></div>
             <span class="new-item" onclick="addItemWindow()">ADD NEW ITEM</span>
             <div class="separator"></div>
-            <span class="f-white f-action"><i class="fas fa-chevron-down toolbar-toggler" title="Toggle the toolbar" onclick="toggleToolbar()"></i></span>
+            <span class="f-white f-action" onclick="toggleToolbar()"><i class="fas fa-chevron-down toolbar-toggler" title="Toggle the toolbar"></i></span>
         </div>
     </footer>
     <div class="alertbox"><i style="margin-right: 7px;" class="fas fa-info-circle"></i><span id="alertbox-span">An error happened</span></div>
