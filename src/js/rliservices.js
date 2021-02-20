@@ -299,7 +299,6 @@ async function searchForItem() {
         var colorListItems = document.getElementsByClassName("listitem");
         for(var i = 0; i < colorListItems.length; i++) {
             colorListItems[i].style.display = "none";
-            console.log(colorListItems[i].innerHTML);
         }
 
         stockAC_withDefault.split(" ").forEach(color => {

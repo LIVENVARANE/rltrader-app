@@ -723,9 +723,9 @@ async function selectColor(color, alternate) {
         colorpicker.style.visibility = "hidden";
     });
     if(color == "default") {
-        var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
+        var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace(":_", "").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
     } else {
-        var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
+        var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace(":_", "").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
     }
     if(alternate == "edit") {
         editPriceType(2);
