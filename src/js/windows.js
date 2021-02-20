@@ -103,9 +103,9 @@ async function editItemWindow(itemToLoad) {
         var colorbutton = document.getElementById("editcolorbutton");
 
         var itemName = getKeyForItem(itemToLoad, "name");
-        var itemSearch = itemName.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "")
+        var itemSearch = itemName.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
         var cssColor = getKeyForItem(itemToLoad, "cssColor");
-        var color = getKeyForItem(itemToLoad, "color")
+        var color = getKeyForItem(itemToLoad, "color"); 
         var isFav = getKeyForItem(itemToLoad, "isFavorite");
 
         itemNameLabel.innerText = itemName;

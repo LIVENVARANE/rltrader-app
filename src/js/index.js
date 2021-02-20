@@ -14,8 +14,8 @@ function pageLoad() {
         if(!fs.existsSync(errorLogsPath)) {
             console.log("File errorlogs.json not found, creating one..");
 
-            var initialContent = {errorlogs: []};
-            fs.writeFileSync(errorLogsPath, JSON.stringify(initialContent, null, 4),'utf-8');
+            var initialErrorContent = {errorlogs: []};
+            fs.writeFileSync(errorLogsPath, JSON.stringify(initialErrorContent, null, 4),'utf-8');
 
         }
         // REMOVE AND NO MORE ERRORLOGS.JSON FILES ------------------------------------
@@ -48,7 +48,7 @@ function pageLoad() {
                     }
                     itemDiv.align = "left";
                     itemDiv.id = "db-item" + item.id;
-                    itemDiv.setAttribute("onclick", "selectItem(" + item.id + ")")
+                    itemDiv.setAttribute("onclick", "selectItem(" + item.id + ")");
                     invContainer.appendChild(itemDiv);
 
                     var infoDiv = document.createElement('div');
@@ -57,7 +57,7 @@ function pageLoad() {
                     var itemImage = document.createElement('img');
                     itemImage.src = item.itemImage;
                     itemImage.className = "itemimage";
-                    itemImage.setAttribute("draggable", "false")
+                    itemImage.setAttribute("draggable", "false");
                     itemDiv.appendChild(itemImage);
 
                     var itemName = document.createElement('span');
@@ -79,7 +79,7 @@ function pageLoad() {
                     var itemPrice = document.createElement('span');
                     itemPrice.innerHTML = "Loading...";
                     itemPrice.className = "itemprice";
-                    infoDiv.appendChild(itemPrice)
+                    infoDiv.appendChild(itemPrice);
 
                     itemDiv.appendChild(infoDiv);
 
@@ -106,7 +106,7 @@ function pageLoad() {
                         });
                         console.log("Saved order changes for inventory");
                     }
-                })
+                });
 
                 //some startup settings
                 if(userDataContent.settings.hideToolbarAtStartupSetting) {
@@ -232,7 +232,7 @@ function selectItem(id) {
     if(itemCheckbox.innerHTML == '<i class="far fa-check-square"></i>') { //selected
         itemCheckbox.innerHTML = '<i class="far fa-square"></i>';
         itemCheckbox.style.removeProperty('opacity');
-        selectedItems = selectedItems.filter(function(e) { return e !== id })
+        selectedItems = selectedItems.filter(function(e) { return e !== id });
         if(selectedItems.length == 0) {
             selectedTitle.innerHTML = "<i>No item selected</i>";
             selectedTitle.style.color = "rgb(201, 201, 201)";
@@ -299,10 +299,11 @@ function selectItem(id) {
 
 async function setPriceForItemBubble(name, color, oldPrice, priceSpan, id) {
     var reqName = name.replace(" :", "").replaceAll(" ", "_").replace("-", "_").replace(":", "");
+    var reqColor;
     if(color == "") {
-        var reqColor = "";
+        reqColor = "";
     } else {
-        var reqColor = "/" + color;
+        reqColor = "/" + color;
     }
     var price = await doItemRequest(reqName, reqColor, "currentPriceRange") + " Cr";
     if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
@@ -376,7 +377,7 @@ function startConfig(type) {
         online_btn.innerHTML = "Coming Soon";
     } else if(type == "offline") {
         $("#questionteller").animate({ opacity: 0 }, function() {
-            question_teller.innerHTML = "Alright, how do you want us to call you?"
+            question_teller.innerHTML = "Alright, how do you want us to call you?";
         });
         $("#questionteller").animate({ opacity: 1 });
         $("#obtn-text").animate({ opacity: 0 }, "fast", function() {
@@ -507,6 +508,7 @@ function saveEditItem(item) {
     selectItem("clear");
     editItemWindow('');
     showAlert("Item successfully edited", "#2ecc71");
+    pageLoad();
 }
 
 var editPriceOption = 1; //1 = dont do anything, 2 = reset to current, 3 = custom span
@@ -521,7 +523,7 @@ async function editPriceType(option) {
             radio.innerHTML = radio.innerHTML.replace('<i class="far fa-square"></i>', '<i class="far fa-check-square"></i>');
         } else {
             radio.style.backgroundColor = "#ff6b81";
-            radio.innerHTML = radio.innerHTML.replace('<i class="far fa-check-square"></i>', '<i class="far fa-square"></i>')
+            radio.innerHTML = radio.innerHTML.replace('<i class="far fa-check-square"></i>', '<i class="far fa-square"></i>');
         }
     }
 
@@ -570,7 +572,7 @@ async function editPriceType(option) {
 function editPriceSpan() {
     var span1 = document.getElementById("edit-pricespan1");
     var span2 = document.getElementById("edit-pricespan2");
-    var editPriceLabel = document.getElementById("editprice")
+    var editPriceLabel = document.getElementById("editprice");
 
     var spanVal1 = Math.round(parseInt(span1.value) / 10) * 10;
     var spanVal2 = Math.round(parseInt(span2.value) / 10) * 10;
@@ -646,7 +648,8 @@ async function selectColor(color, alternate) {
             break;
         case "white":
             colorbutton.innerHTML = "Titanium White";
-            colorbutton.style.background = "#dbdbdb";
+            if(alternate != "") colorbutton.style.background = "#dbdbdb";
+            else colorbutton.style.background = "white";
             colorbutton.style.color = "black";
             break;
         case "grey":
@@ -749,7 +752,7 @@ function addItemToInventory() {
                 var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
                 var price;
-                if(priceLabel.innerText == "No price yet.") { price = "/" } else { price = priceLabel.innerText.replace(" Cr", "") }
+                if(priceLabel.innerText == "No price yet.") { price = "/" } else { price = priceLabel.innerText.replace(" Cr", ""); }
 
                 var color;
                 switch(colorbutton.innerText) {
@@ -815,10 +818,10 @@ function addItemToInventory() {
 
                 showAlert("Item added to your inventory", "#2ecc71");
             } else {
-                alert("An error happened, please contact an administrator. Error code: NFPAI");
+                showAlert("An error happened, please contact an administrator. Error code: NFPAI", "#e74c3c");
             }
         } else {
-            colorbutton.style.color = "red";
+            showAlert("Please select a color", "#e74c3c");
         }
     }
 }
@@ -849,7 +852,7 @@ function setSettingValue(setting, value) {
     var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
     userDataContent.settings[setting] = value;
     fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
-    console.log("Settings updated.")
+    console.log("Settings updated.");
 
     //applying changes live
     switch(setting) {
@@ -880,7 +883,7 @@ function setSettingValue(setting, value) {
     }
 }
 
-function changeInventorySortingType() {
+function changeInventorySortingType() { //GOTTA FINISH
     var sortingTypeIcon = document.getElementById("sorting-type-icon");
 
     if(sortingTypeIcon.className == "fas fa-th-large") { //bubbles mode
@@ -897,6 +900,19 @@ function changeInventorySortingType() {
     }
 }
 
+function resetInventory() {
+    //USE CAREFULLY
+    showDialog("close");
+    //has we are in settings we have to close the window
+    settingsWindow();
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+    userDataContent.inventory = [];
+    fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+    showAlert("Your inventory has been reset", "#2ecc71");
+    pageLoad(); //reloading page
+}
+
 function showAlert(text, backgroundColor) {
     document.getElementById('alertbox-span').innerHTML = text;
     $('.alertbox').css("background-color", backgroundColor);
@@ -905,4 +921,27 @@ function showAlert(text, backgroundColor) {
             $('.alertbox').animate({ opacity: 0 }, "fast");
         }, 5000);
     });
+}
+
+function showDialog(action, title, subtitle, confirmAction) {
+    var titleSpan = document.getElementById("dialog-titlespan");
+    var subtitleDiv = document.getElementById("dialog-subtitle");
+    var confirmButton = document.getElementById("dialog-confirm");
+    switch(action) {
+        case "close":
+            confirmButton.removeAttribute("onclick");
+            $('.dialogbox-container').animate({ opacity: 0 }, "fast", function() {
+                titleSpan.innerText = "An error happened";
+                subtitleDiv.innerText = "An error happened";
+                $('.dialogbox-container').css("display", "none");
+            });
+            break;
+        case "show":
+            $('.dialogbox-container').css("display", "block");
+            titleSpan.innerText = title;
+            subtitleDiv.innerText = subtitle;
+            confirmButton.setAttribute("onclick", confirmAction);
+            $('.dialogbox-container').animate({ opacity: 1 }, "fast");
+            break;
+    }
 }

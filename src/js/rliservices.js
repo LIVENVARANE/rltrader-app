@@ -7,8 +7,7 @@ async function searchForItem() {
     var itemimage = document.getElementById('itemimage');
     var colorbutton = document.getElementById('colorbutton');
     var colorpicker = document.getElementById('colorpicker');
-    var rarityLabel = document.getElementById('rarity');
-    var typeLabel = document.getElementById('type');
+    var typeRarityLabel = document.getElementById('typerarity');
     var aiwLoadingWheel = document.getElementById('aiw-loading');
     var priceLabel = document.getElementById('price');
 
@@ -182,8 +181,33 @@ async function searchForItem() {
         itemimage.setAttribute("draggable", "false");
         itemimage.style.opacity = 1;
         itemnameLabel.innerHTML = decalCar + itemname + specialEditionName;
-        rarityLabel.innerHTML = "Rarity: " + rarity;
-        typeLabel.innerHTML = "Type: " + type;
+        switch(rarity) {
+            case "Uncommon":
+                typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(62,110,125,1) 100%)";
+                break;
+            case "Rare":
+                typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(63,84,131,1) 100%)";
+                break;
+            case "Very Rare":
+                typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(84,67,133,1) 100%)";
+                break;
+            case "Import":
+                typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(164,61,54,1) 100%)";
+                break;
+            case "Exotic":
+                typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(163,151,71,1) 100%)";
+                break;
+            case "Black Market":
+                typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(152,0,150,1) 100%)";
+                break;
+            case "Limited":
+                typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(156,71,34,1) 100%)";
+                break;
+            default:
+                typeRarityLabel.style.background = "#e2e2e2";
+                break;
+        }
+        typeRarityLabel.innerHTML = rarity + " " + type;
         document.getElementById('itemsearch').value = "";
         if(availableColors.toLowerCase().includes(itemcolor.replace("sblue", "sky blue").replace("white", "titanium white").replace("fgreen", "forest green").replace("sienna", "burnt sienna").replace("/", "")) && itemcolor != "") {
             switch(itemcolor) { //we know that the color the user has choosen exists, now we check what it is to select it
@@ -194,7 +218,7 @@ async function searchForItem() {
                     break;
                 case "/white":
                     colorbutton.innerHTML = "Titanium White";
-                    colorbutton.style.background = "#dbdbdb";
+                    colorbutton.style.background = "white";
                     break;
                 case "/grey":
                     colorbutton.innerHTML = "Grey";
@@ -264,7 +288,7 @@ async function searchForItem() {
                 colorbutton.style.color = "white";
                 var price = "Please select a color";
                 if(itemcolor != "") { //the user specified a color but it does not exists
-                    showAlert("The color you specified does not exists for this item." , "#e74c3c")
+                    showAlert("The color you specified does not exists for this item." , "#e74c3c");
                 }
             }
         }
@@ -275,11 +299,12 @@ async function searchForItem() {
         var colorListItems = document.getElementsByClassName("listitem");
         for(var i = 0; i < colorListItems.length; i++) {
             colorListItems[i].style.display = "none";
+            console.log(colorListItems[i].innerHTML);
         }
 
-        stockAC_withDefault.split(" ").forEach(e => {
-            document.getElementById("cp-" + e).style.display = "list-item";
-            document.getElementById("cp-" + e).setAttribute('onclick', 'selectColor("' + e + '", "")');
+        stockAC_withDefault.split(" ").forEach(color => {
+            document.getElementById("cp-" + color).style.display = "list-item";
+            document.getElementById("cp-" + color).setAttribute('onclick', 'selectColor("' + color + '", "")');
         });
     }
 }

@@ -53,26 +53,27 @@
                 <div align="left" style="padding: 20px;">
                     <img src="" id="itemimage" />
                     <h2 id="item-name" style="font-weight: bold; left: 0px;">An error happened</h3><br />
-                    <h2>Color: <span id="colorbutton" title="Click here to change color" onclick="colorPicker('');">An error happened</span></h2><div id="colorpicker">
-                        <li style="text-align: center; display: list-item; border-radius: 5px 5px 0px 0px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9); cursor: default;">Available Colors</li>
-                        <li id="cp-black" onclick="" style="background-color: black; color: white;">Black</li>
-                        <li id="cp-white" class="listitem" style="background-color: #dbdbdb;">Titanium White</li>
-                        <li id="cp-grey" class="listitem" style="background-color: grey;">Grey</li>
-                        <li id="cp-crimson" class="listitem" style="background-color: #de1b1b;">Crimson</li>
-                        <li id="cp-pink" class="listitem" style="background-color: pink;">Pink</li>
-                        <li id="cp-cobalt" class="listitem" style="background-color: #1b5cde;">Cobalt</li>
-                        <li id="cp-sblue" class="listitem" style="background-color: #09e9ed;">Sky Blue</li>
-                        <li id="cp-sienna" class="listitem" style="background-color: brown;">Burnt Sienna</li>
-                        <li id="cp-saffron" class="listitem" style="background-color: yellow;">Saffron</li>
-                        <li id="cp-lime" class="listitem" style="background-color: #07eb12;">Lime</li>
-                        <li id="cp-fgreen" class="listitem" style="background-color: #0d7522;">Forest Green</li>
-                        <li id="cp-orange" class="listitem" style="background-color: orange;">Orange</li>
-                        <li id="cp-purple" class="listitem" style="background-color: purple;">Purple</li>
-                        <li id="cp-default" class="listitem" style="background-color: rgb(49, 49, 49); color: white;">Default</li>
-                        <li style="text-align: center; display: list-item; border-radius: 0px 0px 5px 5px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9);" onclick="colorPicker('');"><u>Close</u></li>
-                    </div><br />
-                    <h2 id="rarity">Rarity: An error happened</h2><br />
-                    <h2 id="type">Type: An error happened</h2><br />
+                    <h2 id="typerarity">Rarity: An error happened</h2><br />
+                    <div class="colorcontainer">
+                        <h2>Selected color: <span id="colorbutton" title="Click here to change color" onclick="colorPicker('');">An error happened</span></h2><div id="colorpicker">
+                            <li style="text-align: center; display: list-item; border-radius: 5px 5px 0px 0px; font-weight: bold; padding: 7px 0px; color: white; background: linear-gradient(to right, #4776E6, #8e54e9); cursor: default;">Available Colors</li>
+                            <li id="cp-black" class="listitem" style="background-color: black; color: white;">Black</li>
+                            <li id="cp-white" class="listitem" style="background-color: #dbdbdb;">Titanium White</li>
+                            <li id="cp-grey" class="listitem" style="background-color: grey;">Grey</li>
+                            <li id="cp-crimson" class="listitem" style="background-color: #de1b1b;">Crimson</li>
+                            <li id="cp-pink" class="listitem" style="background-color: pink;">Pink</li>
+                            <li id="cp-cobalt" class="listitem" style="background-color: #1b5cde;">Cobalt</li>
+                            <li id="cp-sblue" class="listitem" style="background-color: #09e9ed;">Sky Blue</li>
+                            <li id="cp-sienna" class="listitem" style="background-color: brown;">Burnt Sienna</li>
+                            <li id="cp-saffron" class="listitem" style="background-color: yellow;">Saffron</li>
+                            <li id="cp-lime" class="listitem" style="background-color: #07eb12;">Lime</li>
+                            <li id="cp-fgreen" class="listitem" style="background-color: #0d7522;">Forest Green</li>
+                            <li id="cp-orange" class="listitem" style="background-color: orange;">Orange</li>
+                            <li id="cp-purple" class="listitem" style="background-color: purple;">Purple</li>
+                            <li id="cp-default" class="listitem" style="background-color: rgb(49, 49, 49); color: white;">Default</li>
+                            <li style="text-align: center; display: list-item; border-radius: 0px 0px 5px 5px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9);" onclick="colorPicker('');"><u>Close</u></li>
+                        </div>
+                    </div>
                     <div class="ie-footer">
                         <h4>Price Right Now: <span id="price">An error happened</span></h4>
                         <div class="additembutton" onclick="addItemToInventory()">ADD ITEM TO INVENTORY</div>
@@ -117,7 +118,6 @@
                     </div>
                     <div id="s-credits" style="display: none;">
                         <h2>Credits</h2>
-                        <br />
                         <h5>Thank you for using RLTrader !<br />This software has entierly been made by LIVEN (with love).<br />All the items prices and informations are from and belongs to RLInsider and all Rocket League material belongs to Psyonix, Inc. RLTrader have no rights to the game Rocket League and the website RLInsider.<br /><br />Thanks !</h5>
                         <h3>Links</h3>
                         <ul>
@@ -126,6 +126,9 @@
                             <li><a onclick="shell.openExternal('https://github.com/LIVENVARANE/rltrader-app')">RLTrader GitHub page</a></li>
                             <li><a onclick="shell.openExternal('https://twitter.com/LivenOff')">LIVEN's Twitter Account</a></li>
                         </ul>
+                        <div onclick="shell.openExternal('https://github.com/LIVENVARANE/rltrader-app/issues')">REPORT A BUG</div>
+                        <div onclick="showDialog('show', 'Are you sure?', 'If you click confirm, all your items in your inventory will be removed, and you can\'t recover them!', 'resetInventory()')">RESET INVENTORY</div>
+                        <div>RESET APP</div>
                     </div>
                 </div>
             </div>
@@ -137,7 +140,7 @@
                     <img src="" id="edititemimage" />
                     <h2 id="edititem-name" style="font-weight: bold; left: 0px;">Loading..</h3><br />
                     <h2 style="margin-left: 3px;">Color: <span id="editcolorbutton" title="Click here to change color" onclick="colorPicker('1');">An error happened</span></h2><div id="colorpicker1" style="visibility: hidden;">
-                        <li id="edit-title" style="text-align: center; display: list-item; border-radius: 5px 5px 0px 0px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9); cursor: default;">Available Colors</li>
+                        <li id="edit-title" style="text-align: center; display: list-item; border-radius: 5px 5px 0px 0px; font-weight: bold; padding: 7px 0px; color: white; background: linear-gradient(to right, #4776E6, #8e54e9); cursor: default;">Available Colors</li>
                         <li id="cp1-black" class="editlistitem" style="background-color: black; color: white;">Black</li>
                         <li id="cp1-white" class="editlistitem" style="background-color: #dbdbdb;">Titanium White</li>
                         <li id="cp1-grey" class="editlistitem" style="background-color: grey;">Grey</li>
@@ -199,4 +202,5 @@
         </div>
     </footer>
     <div class="alertbox"><i style="margin-right: 7px;" class="fas fa-info-circle"></i><span id="alertbox-span">An error happened</span></div>
+    <div class="dialogbox-container"><div class="dialogbox"><span id="dialog-titlespan">An error happened</span><p id="dialog-subtitle">An error happened</p><div class="bottom"><div class="cancel" onclick="showDialog('close')">CANCEL</div><div class="confirm" id="dialog-confirm">CONFIRM</div></div></div></div>
 </html>

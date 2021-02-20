@@ -1,10 +1,16 @@
 const { app, BrowserWindow } = require('electron')
+const path = require('path')
+
+const iconPath = process.platform !== 'darwin'
+    ? 'src/assets/icons/icon.ico'
+    : 'src/assets/icons/icon.icns';
 
 function createWindow () {
     const win = new BrowserWindow({
       width: 1150,
       height: 800,
       resizable: false,
+      icon: path.join(iconPath),
       webPreferences: {
         nodeIntegration: true,
         enableRemoteModule: true
