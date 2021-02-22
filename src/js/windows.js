@@ -32,11 +32,12 @@ function settingsWindow() {
         });
     } else { //hidden
         navSettings('general');
-
         var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
         var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());    
         if(Object.keys(userDataContent.settings).length == 0) { //set default settings here
             setSettingValue("language", "eng");
+            setSettingValue("dashboardItemStyle", "bubbles");
+            setSettingValue("isShowingOnlyFavorites", false);
             setSettingValue("headerAnimationSetting", true);
             setSettingValue("dashboardItemBorderColor", true);
             setSettingValue("hideToolbarAtStartupSetting", false);
@@ -75,29 +76,23 @@ async function editItemWindow(itemToLoad) {
             setTimeout(function () {
                 eiw.style.visibility = "hidden";
                 document.querySelector("footer").style.zIndex = 0;
+                itemNameLabel.innerText = "Loading...";
+                itemImage.style.opacity = 0;
+                itemImage.src = "";
+                document.getElementById("editprice").style.color = "black";
+                editPriceType(1);
+                document.getElementById("edit-pricespan1").value = "";
+                document.getElementById("edit-pricespan2").value = "";
             }, 100);
         });
-        
-        itemNameLabel.innerText = "Loading...";
-        itemImage.style.opacity = 0;
-        itemImage.src = "";
-
-        document.getElementById("editprice").style.color = "black";
 
         var colorListItems = document.getElementsByClassName('editlistitem');
         for(var i = 0; i < colorListItems.length; i++) {
             colorListItems[i].style.display = "none";
         }
-
         colorpicker.style.visibility = "hidden";
         colorpicker.style.opacity = 0;
-
-        editPriceType(1);
-        document.getElementById("edit-pricespan1").value = "";
-        document.getElementById("edit-pricespan2").value = "";
-
         document.getElementById("edititembutton").removeAttribute("onclick");
-
     } else { //hidden
         //loading item info
         var colorbutton = document.getElementById("editcolorbutton");
@@ -169,9 +164,9 @@ async function editItemWindow(itemToLoad) {
     }
 }
 
-function toggleToolbar() {
+function toggleToolbar(action) {
     var toolbar = document.querySelector("footer");
-    if(toolbar.style.bottom == "23px") { //will hide
+    if(toolbar.style.bottom == "23px" || action == "hide") { //will hide
         $("footer").animate({ bottom: "-46px" });
         $(".bottom-gradient").animate({ opacity: 0 }, "slow");
         $(".toolbar-toggler").animate({ top: "-20px" }, "fast");

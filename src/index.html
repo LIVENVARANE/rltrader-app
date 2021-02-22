@@ -32,11 +32,12 @@
             <span id="header-span-noanim" style="opacity: 0;">RLTrader</span>
             <i class="fas fa-cog settings-btn" onclick="settingsWindow()"></i>
             <i class="fas fa-th-large" id="sorting-type-icon" onclick="changeInventorySortingType()"></i>
-            <i class="far fa-star" id="favorite-sorting-icon"></i>
+            <i class="far fa-star" id="favorite-sorting-icon" onclick="changeOnlyFavoriteMode()"></i>
         </header>
         <div align="center">
             <div id="inv-container"></div>
             <div class="bottom-gradient"></div>
+            <div id="inv-tutorial">Your inventory is empty.<h4>Add item by clicking <a onclick="addItemWindow()">here</a> or the 'ADD NEW ITEM' button!</h4></div>
         </div>
     </body>
     <div align="center" id="windows-container">
@@ -125,10 +126,13 @@
                             <li><a onclick="shell.openExternal('https://rl.insider.gg/')">RLInsider website</a></li>
                             <li><a onclick="shell.openExternal('https://github.com/LIVENVARANE/rltrader-app')">RLTrader GitHub page</a></li>
                             <li><a onclick="shell.openExternal('https://twitter.com/LivenOff')">LIVEN's Twitter Account</a></li>
+                            <li><a onclick="shell.openExternal('https://www.paypal.com/paypalme/livendon')">Make me rich</a></li>
                         </ul>
-                        <div onclick="shell.openExternal('https://github.com/LIVENVARANE/rltrader-app/issues')">REPORT A BUG</div>
-                        <div onclick="showDialog('show', 'Are you sure?', 'If you click confirm, all your items in your inventory will be removed, and you can\'t recover them!', 'resetInventory()')">RESET INVENTORY</div>
-                        <div>RESET APP</div>
+                        <div class="bottom">
+                            <div onclick="shell.openExternal('https://github.com/LIVENVARANE/rltrader-app/issues')">REPORT A BUG</div>
+                            <div onclick="showDialog('show', 'Are you sure?', 'If you click confirm, all your items in your inventory will be removed, and you can\'t recover them!', 'resetInventory()')">RESET INVENTORY</div>
+                            <div onclick="showDialog('show', 'Are you sure?', 'If you click confirm, all your items and settings will be removed, and you can\'t recover them!', 'resetApp()')">RESET APP</div>
+                        </div>
                     </div>
                 </div>
             </div>

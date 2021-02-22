@@ -181,6 +181,11 @@ async function searchForItem() {
         itemimage.setAttribute("draggable", "false");
         itemimage.style.opacity = 1;
         itemnameLabel.innerHTML = decalCar + itemname + specialEditionName;
+        if(itemnameLabel.innerHTML.includes(":")) {
+            itemnameLabel.style.fontSize = "25px";
+        } else {
+            itemnameLabel.style.fontSize = "40px";
+        }
         switch(rarity) {
             case "Uncommon":
                 typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(62,110,125,1) 100%)";
@@ -193,6 +198,7 @@ async function searchForItem() {
                 break;
             case "Import":
                 typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(164,61,54,1) 100%)";
+                rarity = "Imported";
                 break;
             case "Exotic":
                 typeRarityLabel.style.background = "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(163,151,71,1) 100%)";

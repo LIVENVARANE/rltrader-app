@@ -240,9 +240,8 @@ header i:hover {
 
 #settingswindow #settings-page .content h5 {
     font-weight: normal;
-    text-align: left;
     padding: 0px 40px;
-    text-align: center;
+    text-align: justify;
     color: #777777;
 }
 
@@ -295,10 +294,16 @@ header i:hover {
     top: 1px;
 }
 
-#settingswindow #settings-page .content #s-credits div {
+#settingswindow #settings-page .content #s-credits .bottom {
+    position: absolute;
+    bottom: 30px;
+    padding: 0px 30px;
+}
+
+#settingswindow #settings-page .content #s-credits .bottom div {
     margin-top: 10px;
     padding: 8px 0px;
-    width: 80%;
+    width: 346px;
     color: white;
     font-weight: bold;
     border-radius: 8px;
@@ -307,7 +312,7 @@ header i:hover {
     transition: 0.3s ease-out border-radius;
 }
 
-#settingswindow #settings-page .content #s-credits div:hover {
+#settingswindow #settings-page .content #s-credits .bottom div:hover {
     border-radius: 15px;
 }
 
@@ -969,12 +974,39 @@ footer .separator {
     margin: 9px 0px;
 }
 
+#inv-tutorial {
+    visibility: hidden;
+    position: relative;
+    top: 150px;
+    font-size: 46px;
+    font-weight: bold;
+    color: #bfbfbf;
+}
+
+#inv-tutorial h4 {
+    font-weight: normal;
+    color: #bc7c9c;
+    margin-top: 10px;
+    font-size: 22px;
+}
+
+#inv-tutorial a {
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#inv-tutorial a:hover {
+    text-decoration: none;
+}
+
 #inv-container {
     padding: 20px 20px 53px 20px;
     position: absolute;
     bottom: 0px;
     z-index: -3;
     height: 638px;
+    width: 1104px;
     overflow-y: auto;
 }
 
@@ -1001,6 +1033,14 @@ footer .separator {
 }
 
 #inv-container .item:hover > .selectcontainer {
+    opacity: 1;
+}
+
+#inv-container .item:hover > .info .itemprice {
+    opacity: 0;
+}
+
+#inv-container .item:hover > .info .itempercent {
     opacity: 1;
 }
 
@@ -1053,10 +1093,35 @@ footer .separator {
     text-align: center;
 }
 
+#inv-container .item .info .itemtype {
+    visibility: hidden;
+    color: black;
+    padding: 5px 10px;
+    margin: 7px 25px;
+    border-radius: 5px;
+    display: inline-block;
+    text-align: center;
+    width: 170px;
+    background-color: rgb(219, 219, 219);
+    position: absolute;
+    top: -11px;
+    left: 135px;
+}
+
 #inv-container .item .info .itemprice {
     position: absolute;
     bottom: 0px;
     font-weight: bold;
+    opacity: 1;
+    transition: 0.2s ease opacity;
+}
+
+#inv-container .item .info .itempercent {
+    position: absolute;
+    bottom: 0px;
+    font-weight: bold;
+    opacity: 0;
+    transition: 0.2s ease opacity;
 }
 
 .alertbox {

@@ -1,6 +1,8 @@
 const electron = require("electron");
 const fs = require("fs");
-const { shell } = require('electron');
+const { shell } = require('electron'); //used in html to open links
+
+var isFirstLaunched = true;
 
 function pageLoad() {
     const dataFolderPath = (electron.app || electron.remote.app).getPath('userData');
@@ -8,7 +10,7 @@ function pageLoad() {
     if(fs.existsSync(dataFolderPath + "/data/")) {
         var userDataPath = dataFolderPath + "/data/userdata.json";
 
-        //GET INFO ERRORS FILE CREATION ------------------------------------
+        //GET INFO ERRORS FILE CREATION -----------------------------------------------
         var errorLogsPath = dataFolderPath + "/data/errorlogs.json";
 
         if(!fs.existsSync(errorLogsPath)) {
@@ -23,14 +25,7 @@ function pageLoad() {
         if(fs.existsSync(userDataPath)) {
             var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
-            document.getElementById("itemsearch").addEventListener("keyup", function(event) {
-                if(event.key == 'Enter') {
-                    event.preventDefault();
-                    $(".search").click();
-                } else if(event.key == 'Escape') {
-                    addItemWindow();
-                }
-            });
+            if(isFirstLaunched) startListeners();
 
             if(userDataContent.didFirstConnect != 1) {
                 document.getElementById('welcome-screen').style.display = "block";
@@ -39,7 +34,9 @@ function pageLoad() {
                 document.getElementById("f-username").innerText = userDataContent.username;
                 var invContainer = document.getElementById("inv-container");
                 invContainer.innerHTML = "";
+                var isInventoryEmpty = true;
                 userDataContent.inventory.forEach(item => {
+                    isInventoryEmpty = false;
                     var itemDiv = document.createElement('div');
                     itemDiv.className = "item";
                     itemDiv.style.borderTop = "2px solid " + item.cssColor;
@@ -76,20 +73,33 @@ function pageLoad() {
                     }
                     infoDiv.appendChild(itemColor);
 
+                    var itemType = document.createElement('span');
+                    itemType.innerHTML = item.itemType;
+                    itemType.className = "itemtype";
+                    if(userDataContent.settings.dashboardItemStyle == "list") {
+                        itemType.style.visibility = "visible";
+                    }
+                    infoDiv.appendChild(itemType);
+
                     var itemPrice = document.createElement('span');
                     itemPrice.innerHTML = "Loading...";
                     itemPrice.className = "itemprice";
                     infoDiv.appendChild(itemPrice);
 
+                    var itemPercent = document.createElement('span');
+                    itemPercent.innerHTML = "Loading...";
+                    itemPercent.className = "itempercent";
+                    infoDiv.appendChild(itemPercent);
+
                     itemDiv.appendChild(infoDiv);
 
                     var selectContainer = document.createElement('div');
-                    selectContainer.innerHTML = '<i class="far fa-square"></i>';
+                    selectContainer.innerHTML = '<i class="far fa-square selectsquare"></i>';
                     selectContainer.className = "selectcontainer";
                     selectContainer.id = "db-item-cb" + item.id;
                     itemDiv.appendChild(selectContainer);
 
-                    setPriceForItemBubble(item.name, item.color, item.lastCreditPrice, itemPrice, item.id);
+                    setPriceForItemBubble(item.name, item.color, item.lastCreditPrice, itemPrice, itemPercent, item.id);
                 
                 });
                 $("#inv-container").append("<br /><br /><br /><br />");
@@ -105,8 +115,14 @@ function pageLoad() {
                             }
                         });
                         console.log("Saved order changes for inventory");
+                    },
+                    onMove: function() {
+                        if(document.getElementById("favorite-sorting-icon").className == "fas fa-star") return false;
                     }
                 });
+
+                if(isInventoryEmpty) document.getElementById("inv-tutorial").style.display = "block";
+                else document.getElementById("inv-tutorial").style.display = "none";
 
                 //some startup settings
                 if(userDataContent.settings.hideToolbarAtStartupSetting) {
@@ -116,6 +132,8 @@ function pageLoad() {
                     document.getElementById("header-span-anim").style.opacity = 0;
                     document.getElementById("header-span-noanim").style.opacity = 1;
                 }
+                if(userDataContent.settings.dashboardItemStyle == "list") changeInventorySortingType();
+                if(userDataContent.settings.isShowingOnlyFavorites == true) changeOnlyFavoriteMode();
             }
         } else {
             console.log("File userdata.json not found, creating one..");
@@ -129,9 +147,51 @@ function pageLoad() {
         fs.mkdirSync(dataFolderPath + "/data/");
         pageLoad();
     }
+    isFirstLaunched = false;
 }
 
 window.onload = pageLoad;
+
+function startListeners() {
+    document.getElementById("itemsearch").addEventListener("keyup", function(event) {
+        if(event.key == 'Enter') {
+            event.preventDefault();
+            $(".search").click();
+        }
+    });
+    $('#additemwindow').on('click', function(e) {
+        if (e.target !== this)
+          return;
+        
+        addItemWindow();
+    });
+    $('#settingswindow').on('click', function(e) {
+        if (e.target !== this)
+          return;
+        
+        settingsWindow();
+    });
+    $('#edititemwindow').on('click', function(e) {
+        if (e.target !== this)
+          return;
+        
+        editItemWindow();
+    });
+    document.addEventListener("keyup", function(event) {
+        if(event.key == "Escape") {
+            if(document.getElementById("edititemwindow").style.visibility == "visible") {
+                event.preventDefault();
+                editItemWindow();
+            } else if(document.getElementById("settingswindow").style.visibility == "visible") {
+                event.preventDefault();
+                settingsWindow();
+            } else if(document.getElementById("additemwindow").style.visibility == "visible") {
+                event.preventDefault();
+                addItemWindow();
+            }
+        }
+    });
+}
 
 function bringItemToFront(id) {
     var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
@@ -153,8 +213,6 @@ function bringItemToFront(id) {
 
     fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
 }
-
-var selectedItems = [];
 
 function doItemAction(type) {
     if(selectedItems.length != 0) {
@@ -190,9 +248,10 @@ function doItemAction(type) {
                 selectItem("clear");
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
                 showAlert("Item removed from your inventory", "#2ecc71");
+                if(Object.keys(userDataContent.inventory).length == 0) document.getElementById("inv-tutorial").style.display = "block";
                 break;
             case "dup":
-                
+                //TODO
                 break;
             case "edi":
                 if(selectedItems.length == 1) { //can only edit one item at once
@@ -204,6 +263,8 @@ function doItemAction(type) {
         }
     }
 }
+
+var selectedItems = [];
 
 function selectItem(id) {
     var itemCheckbox = document.getElementById("db-item-cb" + id);
@@ -229,9 +290,16 @@ function selectItem(id) {
         return;
     }
 
-    if(itemCheckbox.innerHTML == '<i class="far fa-check-square"></i>') { //selected
-        itemCheckbox.innerHTML = '<i class="far fa-square"></i>';
-        itemCheckbox.style.removeProperty('opacity');
+    if(itemCheckbox.innerHTML == '<i class="far fa-check-square selectsquare"></i>'
+    || itemCheckbox.innerHTML == '<i class="far fa-check-square selectsquare" style="top: 0px; color: black;"></i>'
+    || itemCheckbox.innerHTML == '<i class="far fa-check-square selectsquare" style="top: 70px; color: white;"></i>'
+    || id == "refresh"
+    ) { //selected
+        if(itemCheckbox.style.color == "black") itemCheckbox.innerHTML = '<i class="far fa-square selectsquare" style="top: 0px; color: black;"></i>';
+        else {
+            itemCheckbox.innerHTML = '<i class="far fa-square selectsquare"></i>';
+            itemCheckbox.style.removeProperty('opacity');
+        }
         selectedItems = selectedItems.filter(function(e) { return e !== id });
         if(selectedItems.length == 0) {
             selectedTitle.innerHTML = "<i>No item selected</i>";
@@ -268,7 +336,8 @@ function selectItem(id) {
             actionEdi.style.cursor = "not-allowed";
         }
     } else {
-        itemCheckbox.innerHTML = '<i class="far fa-check-square"></i>';
+        if(itemCheckbox.style.color == "black") itemCheckbox.innerHTML = '<i class="far fa-check-square selectsquare" style="top: 0px; color: black;"></i>';
+        else itemCheckbox.innerHTML = '<i class="far fa-check-square selectsquare"></i>';
         itemCheckbox.style.opacity = 1;
         selectedItems.push(id);
         selectedTitle.style.color = "white";
@@ -297,7 +366,7 @@ function selectItem(id) {
     }
 }
 
-async function setPriceForItemBubble(name, color, oldPrice, priceSpan, id) {
+async function setPriceForItemBubble(name, color, oldPrice, priceSpan, pricePercent, id) {
     var reqName = name.replace(" :", "").replaceAll(" ", "_").replace("-", "_").replace(":", "");
     var reqColor;
     if(color == "") {
@@ -306,6 +375,7 @@ async function setPriceForItemBubble(name, color, oldPrice, priceSpan, id) {
         reqColor = "/" + color;
     }
     var price = await doItemRequest(reqName, reqColor, "currentPriceRange") + " Cr";
+    var priceChange = "No change";
     if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
     if(price == "no Cr") price = "Error";
     priceSpan.innerHTML = price;
@@ -326,11 +396,16 @@ async function setPriceForItemBubble(name, color, oldPrice, priceSpan, id) {
                 price[1] = parseInt(price[1] * 1000);
             }
             price = price[0] + price[1];
+            priceChange = Math.round(price / oldPrice * 100 - 100).toString() + "%";
+            if(!priceChange.includes("-")) priceChange = "+" + priceChange;
+            if(priceChange == "+0%") priceChange = "No change";
             if(price > oldPrice) {
-                priceSpan.style.color = "green";
+                priceSpan.style.color = "rgb(0, 184, 148)";
+                pricePercent.style.color = "rgb(0, 184, 148)";
             }
             else if(price < oldPrice) {
-                priceSpan.style.color = "red";
+                priceSpan.style.color = "rgb(255, 107, 129)";
+                pricePercent.style.color = "rgb(255, 107, 129)";
             }
         }
     } else {
@@ -338,6 +413,7 @@ async function setPriceForItemBubble(name, color, oldPrice, priceSpan, id) {
             modifyKeyForItem(id, "lastCreditPrice", price);
         }
     }
+    pricePercent.innerHTML = priceChange;
 }
 
 function getKeyForItem(id, key) {
@@ -800,7 +876,7 @@ function addItemToInventory() {
                         break;
                 }
 
-                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.idIncrement + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "lastCreditPrice":price, "isFavorite":false});
+                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.idIncrement + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "itemType":document.getElementById('typerarity').innerText, "lastCreditPrice":price, "isFavorite":false});
                 userDataContent.idIncrement++;
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
                 console.log("Added item: \"" + itemnameLabel.innerText + "\" to inventory.");
@@ -883,21 +959,164 @@ function setSettingValue(setting, value) {
     }
 }
 
-function changeInventorySortingType() { //GOTTA FINISH
-    var sortingTypeIcon = document.getElementById("sorting-type-icon");
+function changeOnlyFavoriteMode() {
+    var favoriteIcon = document.getElementById("favorite-sorting-icon");
+    var sortingType = document.getElementById("sorting-type-icon");
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+    var displayValue;
 
-    if(sortingTypeIcon.className == "fas fa-th-large") { //bubbles mode
-        $("#sorting-type-icon").animate({ opacity: 0 }, "fast", function() {
-            sortingTypeIcon.className = "fas fa-th-list";
-            $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
+    if(favoriteIcon.className == "far fa-star") { //not enabled, will enable
+        $("#favorite-sorting-icon").animate({ opacity: 0 }, "fast", function() {
+            favoriteIcon.className = "fas fa-star";
+            $("#favorite-sorting-icon").animate({ opacity: 0.8 }, "fast");
         });
-        
-    } else { //list mode
-        $("#sorting-type-icon").animate({ opacity: 0 }, "fast", function() {
-            sortingTypeIcon.className = "fas fa-th-large";
-            $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
+        displayValue = "none"; 
+        userDataContent.settings.isShowingOnlyFavorites = true;
+    } else { //enabled, will disable
+        $("#favorite-sorting-icon").animate({ opacity: 0 }, "fast", function() {
+            favoriteIcon.className = "far fa-star";
+            $("#favorite-sorting-icon").animate({ opacity: 0.8 }, "fast");
         });
+        if(sortingType.className == "fas fa-th-large") displayValue = "inline-flex";
+        else displayValue = "block";
+        userDataContent.settings.isShowingOnlyFavorites = false;
     }
+    fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+
+    userDataContent.inventory.forEach(item => {
+        if(!item.isFavorite) {
+            if(displayValue == "none") { //will hide item
+                $("#db-item" + item.id).animate({ opacity: 0 }, "fast", function() {
+                    document.getElementById("db-item" + item.id).style.display = displayValue;
+                    if(selectedItems.includes(item.id)) selectItem(item.id);
+                });
+            } else { //will show item
+                document.getElementById("db-item" + item.id).style.opacity = 0;
+                document.getElementById("db-item" + item.id).style.display = displayValue;
+                $("#db-item" + item.id).animate({ opacity: 1 }, "fast");
+            }
+        }
+    });
+    console.log("Settings updated.");
+}
+
+function changeInventorySortingType() {
+    var sortingTypeIcon = document.getElementById("sorting-type-icon");
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+
+    $("#inv-container").animate({ opacity: 0 }, "fast", function() {
+        if(sortingTypeIcon.className == "fas fa-th-large") { //list mode
+            $("#sorting-type-icon").animate({ opacity: 0 }, "fast", function() {
+                sortingTypeIcon.className = "fas fa-th-list";
+                $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
+            });
+            userDataContent.settings.dashboardItemStyle = "list";
+            fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+    
+            //modifying layout
+            $(".item").css("width", "unset");
+            $(".item").css("height", "70px");
+            $('#inv-container').children('div').each(function () {
+                var itemId = $(this).attr('id');
+                if(document.getElementById(itemId).id.includes("db-item")) {
+                    if(document.getElementById(itemId).style.display != "none") {
+                        document.getElementById(itemId).style.display = "block";
+                    }
+                }
+            });
+            $(".itemimage").css("width", "70px");
+            $(".itemimage").css("margin-left", "35px");
+            $(".info").css("display", "inline");
+            $(".info").css("bottom", "10px");
+            $(".itemname").css("font-size", "19px");
+            $(".itemname").css("position", "relative");
+            $(".itemname").css("top", "-20px");
+            $(".bigitemname").css("position", "relative");
+            $(".bigitemname").css("top", "-20px");
+            $(".itemcolor").css("margin", "7px 25px");
+            $(".itemcolor").css("width", "170px");
+            $(".itemcolor").css("display", "inline-block");
+            $(".itemcolor").css("position", "absolute");
+            $(".itemcolor").css("left", "135px");
+            $(".itemcolor").css("top", "-52px");
+            $(".itemtype").css("visibility", "visible");
+            $(".itemprice").css("bottom", "30px");
+            $(".itemprice").css("left", "370px");
+            $(".itemprice").css("width", "150px");
+            $(".itemprice").css("opacity", "1");
+            $(".itempercent").css("bottom", "9px");
+            $(".itempercent").css("left", "370px");
+            $(".itempercent").css("width", "150px");
+            $(".itempercent").css("opacity", "1");
+            $(".selectcontainer").css("opacity", "1");
+            $(".selectcontainer").css("position", "relative");
+            $(".selectcontainer").css("top", "-53px");
+            $(".selectcontainer").css("left", "-5px");
+            $(".selectcontainer").css("color", "black");
+            $(".selectsquare").css("top", "0px");
+            $(".selectsquare").css("color", "black");
+    
+        } else { //bubbles mode
+            $("#sorting-type-icon").animate({ opacity: 0 }, "fast", function() {
+                sortingTypeIcon.className = "fas fa-th-large";
+                $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
+            });
+            userDataContent.settings.dashboardItemStyle = "bubbles";
+            fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+    
+            //modifying layout
+            $(".item").css("width", "220px");
+            $(".item").css("height", "100px");
+            $('#inv-container').children('div').each(function () {
+                var itemId = $(this).attr('id');
+                if(document.getElementById(itemId).id.includes("db-item")) {
+                    if(document.getElementById(itemId).style.display != "none") {
+                        document.getElementById(itemId).style.display = "inline-flex";
+                    }
+                }
+            });
+            $(".itemimage").css("width", "100px");
+            $(".itemimage").css("margin-left", "");
+            $(".info").css("display", "block");
+            $(".info").css("bottom", "");
+            $(".itemname").css("font-size", "");
+            $(".itemname").css("position", "");
+            $(".itemname").css("top", "");
+            $(".bigitemname").css("position", "");
+            $(".bigitemname").css("top", "");
+            $(".itemcolor").css("margin", "");
+            $(".itemcolor").css("width", "");
+            $(".itemcolor").css("display", "block");
+            $(".itemcolor").css("position", "");
+            $(".itemcolor").css("left", "");
+            $(".itemcolor").css("top", "");
+            $(".itemtype").css("visibility", "hidden");
+            $(".itemprice").css("bottom", "0px");
+            $(".itemprice").css("left", "");
+            $(".itemprice").css("width", "");
+            $(".itemprice").css("opacity", "");
+            $(".itempercent").css("bottom", "0px");
+            $(".itempercent").css("left", "");
+            $(".itempercent").css("width", "");
+            $(".itempercent").css("opacity", "");
+            $(".selectcontainer").css("opacity", "");
+            $(".selectcontainer").css("position", "absolute");
+            $(".selectcontainer").css("top", "");
+            $(".selectcontainer").css("left", "");
+            $(".selectcontainer").css("color", "");
+            $(".selectsquare").css("color", "white");
+            $(".selectsquare").css("top", "70px");
+
+            //backing bubbles checkboxes opacity behavior to normal
+            selectedItems.forEach(id => {
+                document.getElementById("db-item-cb" + id).style.opacity = 1;
+            });
+        }
+        $("#inv-container").animate({ opacity: 1 }, "fast");
+    });
+    console.log("Settings updated.");
 }
 
 function resetInventory() {
@@ -911,6 +1130,18 @@ function resetInventory() {
     fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
     showAlert("Your inventory has been reset", "#2ecc71");
     pageLoad(); //reloading page
+}
+
+function resetApp() {
+    //USE CAREFULLY
+    showDialog("close");
+    //has we are in settings we have to close the window
+    settingsWindow();
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var initialContent = {"didFirstConnect":0};
+    fs.writeFileSync(userDataPath, JSON.stringify(initialContent, null, 4),'utf-8');
+    showAlert("RLTrader has been reset", "#2ecc71");
+    pageLoad();
 }
 
 function showAlert(text, backgroundColor) {
