@@ -1,6 +1,25 @@
-const electron = require("electron");
+const electron = require('electron');
 const fs = require("fs");
 const { shell } = require('electron'); //used in html to open links
+
+const { ipcRenderer } = require('electron');
+
+    ipcRenderer.send('app_version');
+
+    ipcRenderer.on('app_version', (event, arg) => {
+      ipcRenderer.removeAllListeners('app_version');
+      console.log("RLTrader version is " + arg.version);
+    });
+
+    ipcRenderer.on('update_available', () => {
+        ipcRenderer.removeAllListeners('update_available');
+        console.log("An update is available!");
+    });
+
+    ipcRenderer.on('update_downloaded', () => {
+        ipcRenderer.removeAllListeners('update_downloaded');
+        console.log("Update downloaded.");
+    });
 
 var isFirstLaunched = true;
 
