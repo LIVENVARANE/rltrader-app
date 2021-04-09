@@ -17,7 +17,7 @@
         "electron-builder": "^22.10.5"
     },
     "repository": {
-        "type" : "git",
-        "url" : "https://github.com/LIVENVARANE/rltrader-app.git"
+        "type": "git",
+        "url": "https://github.com/LIVENVARANE/rltrader-app.git"
     }
 }
