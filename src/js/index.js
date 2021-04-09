@@ -18,7 +18,8 @@ const { ipcRenderer } = require('electron');
 
     ipcRenderer.on('update_downloaded', () => {
         ipcRenderer.removeAllListeners('update_downloaded');
-        console.log("Update downloaded.");
+        console.log("Update downloaded. Restarting...");
+        ipcRenderer.send('restart_app_update');
     });
 
 var isFirstLaunched = true;
