@@ -102,11 +102,27 @@ async function editItemWindow(itemToLoad) {
         var cssColor = getKeyForItem(itemToLoad, "cssColor");
         var color = getKeyForItem(itemToLoad, "color"); 
         var isFav = getKeyForItem(itemToLoad, "isFavorite");
+        var isBM = getKeyForItem(itemToLoad, "itemType").includes("Black Market");
 
         itemNameLabel.innerText = itemName;
-        itemImage.src = getKeyForItem(itemToLoad, "itemImage");
-        itemImage.style.opacity = 1;
-        itemImage.setAttribute("draggable", "false");
+        
+        if(isBM) { //if item is a bm, rlinsider now only has mp4 videos of the item
+            var videoElement = document.createElement('video');
+            videoElement.id = "edititemimage";
+            itemImage.parentNode.replaceChild(videoElement, itemImage);
+            videoElement.src = getKeyForItem(itemToLoad, "itemImage");
+            videoElement.setAttribute("autoplay", "");
+            videoElement.setAttribute("loop", "");
+            videoElement.style.opacity = 1;
+            videoElement.setAttribute("draggable", "false");
+        } else {
+            var imageElement = document.createElement('img');
+            imageElement.id = "edititemimage";
+            itemImage.parentNode.replaceChild(imageElement, itemImage);
+            imageElement.src = getKeyForItem(itemToLoad, "itemImage");
+            imageElement.style.opacity = 1;
+            imageElement.setAttribute("draggable", "false");
+        }
         document.getElementById("edit-title").innerText = "Loading Available Colors...";
         
         colorbutton.style.background = cssColor;

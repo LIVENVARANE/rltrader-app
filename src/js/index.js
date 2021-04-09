@@ -51,9 +51,12 @@ function pageLoad() {
                     var infoDiv = document.createElement('div');
                     infoDiv.className = "info";
 
-                    var itemImage = document.createElement('img');
+                    if(item.itemType.includes("Black Market")) var itemImage = document.createElement('video');
+                    else var itemImage = document.createElement('img');
                     itemImage.src = item.itemImage;
                     itemImage.className = "itemimage";
+                    itemImage.setAttribute("autoplay", "");
+                    itemImage.setAttribute("loop", "");
                     itemImage.setAttribute("draggable", "false");
                     itemDiv.appendChild(itemImage);
 
@@ -696,6 +699,8 @@ function colorPicker(number) {
 async function selectColor(color, alternate) {
     var colorbutton = document.getElementById(alternate + 'colorbutton');
     var priceLabel = document.getElementById(alternate + 'price');
+    var typeRarityLabel = document.getElementById('typerarity');
+
     if(alternate != "") var colorpicker = document.getElementById('colorpicker1');
     else var colorpicker = document.getElementById('colorpicker');
     
@@ -705,9 +710,17 @@ async function selectColor(color, alternate) {
     $("#" + alternate +"itemimage").animate({ opacity: 0 }, "fast");
     var itemNameSearch = itemnameLabel.innerText.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
     var itemImageURL = await doItemRequest(itemNameSearch, "/" + color.replace("default", ""), true);
-    itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
-    try {
+    if(typeRarityLabel.innerText.includes("Black Market")) {
+        itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<video src=\"https://img.rl.insider.gg/itemPics/mp4/") + 12);
+        itemImageURL = itemImageURL.substring(0, itemImageURL.indexOf('"'));
+        itemImage.src = itemImageURL;
+
+    } else {
+        itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
+        itemImageURL = itemImageURL.substring(0, itemImageURL.indexOf('"'));
         itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
+    }
+    try {
     } catch (error) {
         var errorLogsPath = (electron.app || electron.remote.app).getPath('userData') + "/data/errorlogs.json";
         var errorLogsContent = JSON.parse(fs.readFileSync(errorLogsPath, 'utf-8').toString());

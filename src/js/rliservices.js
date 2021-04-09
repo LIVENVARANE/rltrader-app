@@ -169,17 +169,37 @@ async function searchForItem() {
         rarity = rarity.substring(0, rarity.indexOf('</td></tr><tr><td>Type</td>'));
         type = type.substring(type.indexOf("<td>Type</td><td>") + 17)
         type = type.substring(0, type.indexOf('</td></tr><tr><td>Series</td>'));
-        itemPicURL = itemPicURL.substring(itemPicURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
-        itemPicURL = itemPicURL.substring(0, itemPicURL.indexOf('"'));
+        if(rarity.includes("Black Market")) {
+            itemPicURL = itemPicURL.substring(itemPicURL.indexOf("<video src=\"https://img.rl.insider.gg/itemPics/mp4/") + 12);
+            itemPicURL = itemPicURL.substring(0, itemPicURL.indexOf('"'));
+        } else {
+            itemPicURL = itemPicURL.substring(itemPicURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
+            itemPicURL = itemPicURL.substring(0, itemPicURL.indexOf('"'));
+        }
 
         //SHOWING WINDOW OF ITEM
         aiwLoadingWheel.style.visibility = "hidden";
         iteminfo.style.visibility = "visible";
         iteminfo.style.opacity = 0;
         $("#iteminfo").animate({ opacity: 1 }, "fast");
-        itemimage.src = itemPicURL;
-        itemimage.setAttribute("draggable", "false");
-        itemimage.style.opacity = 1;
+        if(rarity.includes("Black Market")) { //if item is a bm, rlinsider now only has mp4 videos of the item
+            var videoElement = document.createElement('video');
+            videoElement.id = "itemimage";
+            itemimage.parentNode.replaceChild(videoElement, itemimage);
+            videoElement.src = itemPicURL;
+            videoElement.style.opacity = 1;
+            videoElement.setAttribute("autoplay", "");
+            videoElement.setAttribute("loop", "");
+            videoElement.setAttribute("draggable", "false");
+        } else {
+            var imageElement = document.createElement('img');
+            imageElement.id = "itemimage";
+            itemimage.parentNode.replaceChild(imageElement, itemimage);
+            imageElement.src = itemPicURL;
+            imageElement.style.opacity = 1;
+            imageElement.setAttribute("draggable", "false");
+        }
+
         itemnameLabel.innerHTML = decalCar + itemname + specialEditionName;
         if(itemnameLabel.innerHTML.includes(":")) {
             itemnameLabel.style.fontSize = "25px";
