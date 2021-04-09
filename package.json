@@ -5,7 +5,9 @@
     "description": "RLTrader app",
     "main": "main.js",
     "scripts": {
-        "start": "electron ."
+        "start": "electron .",
+        "build": "electron-builder build --win --publish never",
+        "deploy": "electron-builder build --win --publish always"
     },
     "dependencies": {
         "electron-updater": "^4.3.8"
@@ -17,7 +19,5 @@
     "repository": {
         "type" : "git",
         "url" : "https://github.com/LIVENVARANE/rltrader-app.git"
-    },
-    "build": "electron-builder build --win --publish never",
-    "deploy": "electron-builder build --win --publish always"
+    }
 }
