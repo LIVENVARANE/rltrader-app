@@ -36,6 +36,8 @@
             <img src="assets/ball-little.png"/>
             <span id="header-span-anim" style="opacity: 1;">RLTrader</span>
             <span id="header-span-noanim" style="opacity: 0;">RLTrader</span>
+            <i class="control-btn close" onclick="ipcRenderer.send('close_app');"><span>×</span></i>
+            <i class="control-btn minimize" onclick="ipcRenderer.send('minimize_app');" style="border-radius: 10px 0px 0px 10px;"><span>−</span></i>
             <i class="fas fa-cog settings-btn" onclick="settingsWindow()"></i>
             <i class="fas fa-th-large" id="sorting-type-icon" onclick="changeInventorySortingType()"></i>
             <i class="far fa-star" id="favorite-sorting-icon" onclick="changeOnlyFavoriteMode()"></i>
@@ -198,7 +200,7 @@
         </div>
     </div>
     <footer style="bottom: 23px;">
-        <span style="font-weight: bold; line-height: 3;" id="f-username">LIVEN</span>
+        <span style="font-weight: bold; line-height: 3;" id="f-username"></span>
         <div class="separator"></div>
         <span id="selectedtitle"><i>No item selected</i></span>
         <div class="right">

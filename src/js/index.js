@@ -3,14 +3,6 @@ const fs = require("fs");
 const { shell } = require('electron'); //used in html to open links
 const { ipcRenderer } = require('electron');
 
-ipcRenderer.send('app_version');
-ipcRenderer.on('app_version', (event, arg) => {
-    ipcRenderer.removeAllListeners('app_version');
-    console.log("RLTrader version is " + arg.version);
-    document.getElementById('update-app-version').innerText = "Version " + arg.version;
-    document.getElementById('settings-app-version').innerText = "Version " + arg.version;
-});
-
 ipcRenderer.on('message', function(event, text) { //shows auto-updater messages in console
     console.log(text);
     if(text == 'An update is available! Downloading..') {
@@ -21,6 +13,15 @@ ipcRenderer.on('message', function(event, text) { //shows auto-updater messages 
 var isFirstLaunched = true;
 
 function pageLoad() {
+
+    ipcRenderer.send('app_version');
+    ipcRenderer.on('app_version', (event, arg) => {
+        ipcRenderer.removeAllListeners('app_version');
+        console.log("RLTrader version is " + arg.version);
+        document.getElementById('update-app-version').innerText = "Version " + arg.version;
+        document.getElementById('settings-app-version').innerText = "Version " + arg.version;
+    });
+
     const dataFolderPath = (electron.app || electron.remote.app).getPath('userData');
 
     if(fs.existsSync(dataFolderPath + "/data/")) {
@@ -517,6 +518,7 @@ function startConfig(type) {
             userDataContent.settings = {};
             
             fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+            document.getElementById("f-username").innerText = username_field.value;
 
             setTimeout(function () {
                 $("#welcome-screen").fadeOut("fast");
@@ -719,7 +721,8 @@ function colorPicker(number) {
 async function selectColor(color, alternate) {
     var colorbutton = document.getElementById(alternate + 'colorbutton');
     var priceLabel = document.getElementById(alternate + 'price');
-    var isBM = document.getElementById('edititem-name').getAttribute("isBM");
+    var isBM_edit = document.getElementById('edititem-name').getAttribute("isBM");
+    var isBM_add = document.getElementById('typerarity').innerText.includes("Black Market");
 
     if(alternate != "") var colorpicker = document.getElementById('colorpicker1');
     else var colorpicker = document.getElementById('colorpicker');
@@ -730,11 +733,13 @@ async function selectColor(color, alternate) {
     $("#" + alternate +"itemimage").animate({ opacity: 0 }, "fast");
     var itemNameSearch = itemnameLabel.innerText.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
     var itemImageURL = await doItemRequest(itemNameSearch, "/" + color.replace("default", ""), true);
-    if(isBM) {
+    console.log(itemImageURL);
+    if(isBM_edit || isBM_add) {
         itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<video src=\"https://img.rl.insider.gg/itemPics/mp4/") + 12);
     } else {
         itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
     }
+    console.log(itemImageURL);
     itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
     try {
     } catch (error) {

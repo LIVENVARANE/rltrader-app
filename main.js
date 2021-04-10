@@ -19,6 +19,7 @@ function createWindow() {
     height: 800,
     resizable: false,
     icon: path.join(iconPath),
+    frame: false,
         
     webPreferences: {
       nodeIntegration: true,
@@ -27,7 +28,6 @@ function createWindow() {
     }
   })
 
-  win.loadFile('src/index.html');
   //win.webContents.openDevTools();
   win.setMenuBarVisibility(false);
 
@@ -36,32 +36,44 @@ function createWindow() {
     autoUpdater.checkForUpdates();
   });
 }
-  
-  app.whenReady().then(createWindow);
+
+  app.on('ready', () => {
+    createWindow();
+    win.loadFile('src/loading.html');
+    setTimeout(function(){ 
+      
+      win.loadFile('src/index.html');
+  }, 2000);  
+  })
   
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit();
     }
   })
-  
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  })
+
 
   ipcMain.on('app_version', (event) => {
     event.sender.send('app_version', { version: app.getVersion() });
   });
 
+  ipcMain.on('close_app', () => {
+    app.quit();
+  });
+
+  ipcMain.on('minimize_app', () => {
+    win.minimize();
+  });
+
   autoUpdater.on('checking-for-update', () => {
     sendStatusToWindow('Checking for updates...');
   })
+
   autoUpdater.on('update-available', (info) => {
     sendStatusToWindow('An update is available! Downloading..');
     autoUpdater.downloadUpdate();
   })
+
   autoUpdater.on('update-not-available', (info) => {
     sendStatusToWindow('RLTrader is up to date.');
   })
