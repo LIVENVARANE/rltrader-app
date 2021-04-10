@@ -1,26 +1,22 @@
 const electron = require('electron');
 const fs = require("fs");
 const { shell } = require('electron'); //used in html to open links
-
 const { ipcRenderer } = require('electron');
 
-    ipcRenderer.send('app_version');
+ipcRenderer.send('app_version');
+ipcRenderer.on('app_version', (event, arg) => {
+    ipcRenderer.removeAllListeners('app_version');
+    console.log("RLTrader version is " + arg.version);
+    document.getElementById('update-app-version').innerText = "Version " + arg.version;
+    document.getElementById('settings-app-version').innerText = "Version " + arg.version;
+});
 
-    ipcRenderer.on('app_version', (event, arg) => {
-      ipcRenderer.removeAllListeners('app_version');
-      console.log("RLTrader version is " + arg.version);
-    });
-
-    ipcRenderer.on('update_available', () => {
-        ipcRenderer.removeAllListeners('update_available');
-        console.log("An update is available!");
-    });
-
-    ipcRenderer.on('update_downloaded', () => {
-        ipcRenderer.removeAllListeners('update_downloaded');
-        console.log("Update downloaded. Restarting...");
-        ipcRenderer.send('restart_app_update');
-    });
+ipcRenderer.on('message', function(event, text) { //shows auto-updater messages in console
+    console.log(text);
+    if(text == 'An update is available! Downloading..') {
+        document.getElementById('update-available').style.display = "block";
+    }
+});
 
 var isFirstLaunched = true;
 
@@ -273,13 +269,17 @@ function doItemAction(type) {
                 showAlert("Item removed from your inventory", "#2ecc71");
                 if(Object.keys(userDataContent.inventory).length == 0) document.getElementById("inv-tutorial").style.display = "block";
                 break;
-            case "dup":
-                //TODO
-                break;
             case "edi":
                 if(selectedItems.length == 1) { //can only edit one item at once
                     editItemWindow(selectedItems[0]);
                 }
+                break;
+            case "cle":
+                selectedItems.forEach(itemId => {
+                    document.getElementById("db-item-cb" + itemId).innerHTML = '<i class="far fa-square"></i>';
+                    document.getElementById("db-item-cb" + itemId).style.opacity = 0;
+                });
+                selectItem('clear');
                 break;
             default:
                 break;
@@ -294,7 +294,7 @@ function selectItem(id) {
     var selectedTitle = document.getElementById("selectedtitle");
     var actionFav = document.getElementById("actionFav");
     var actionDel = document.getElementById("actionDel");
-    var actionDup = document.getElementById("actionDup");
+    var actionCle = document.getElementById("actionCle");
     var actionEdi = document.getElementById("actionEdi");
 
     if(id == "clear") {
@@ -303,11 +303,11 @@ function selectItem(id) {
         selectedTitle.style.color = "rgb(201, 201, 201)";
         actionFav.style.color = "rgb(201, 201, 201)";
         actionDel.style.color = "rgb(201, 201, 201)";
-        actionDup.style.color = "rgb(201, 201, 201)";
+        actionCle.style.color = "rgb(201, 201, 201)";
         actionEdi.style.color = "rgb(201, 201, 201)";
         actionFav.style.cursor = "not-allowed";
         actionDel.style.cursor = "not-allowed";
-        actionDup.style.cursor = "not-allowed";
+        actionCle.style.cursor = "not-allowed";
         actionEdi.style.cursor = "not-allowed";
 
         return;
@@ -329,33 +329,33 @@ function selectItem(id) {
             selectedTitle.style.color = "rgb(201, 201, 201)";
             actionFav.style.color = "rgb(201, 201, 201)";
             actionDel.style.color = "rgb(201, 201, 201)";
-            actionDup.style.color = "rgb(201, 201, 201)";
+            actionCle.style.color = "rgb(201, 201, 201)";
             actionEdi.style.color = "rgb(201, 201, 201)";
             actionFav.style.cursor = "not-allowed";
             actionDel.style.cursor = "not-allowed";
-            actionDup.style.cursor = "not-allowed";
+            actionCle.style.cursor = "not-allowed";
             actionEdi.style.cursor = "not-allowed";
         }
         else if(selectedItems.length == 1) { 
             selectedTitle.innerHTML = selectedItems.length + " item selected";
             actionFav.style.color = "white";
             actionDel.style.color = "white";
-            actionDup.style.color = "white";
+            actionCle.style.color = "white";
             actionEdi.style.color = "white";
             actionFav.style.cursor = "pointer";
             actionDel.style.cursor = "pointer";
-            actionDup.style.cursor = "pointer";
+            actionCle.style.cursor = "pointer";
             actionEdi.style.cursor = "pointer";
         }
         else {
             selectedTitle.innerHTML = selectedItems.length + " items selected";
             actionFav.style.color = "white";
             actionDel.style.color = "white";
-            actionDup.style.color = "white";
+            actionCle.style.color = "white";
             actionEdi.style.color = "rgb(201, 201, 201)";
             actionFav.style.cursor = "pointer";
             actionDel.style.cursor = "pointer";
-            actionDup.style.cursor = "pointer";
+            actionCle.style.cursor = "pointer";
             actionEdi.style.cursor = "not-allowed";
         }
     } else {
@@ -368,22 +368,22 @@ function selectItem(id) {
             selectedTitle.innerHTML = selectedItems.length + " item selected";
             actionFav.style.color = "white";
             actionDel.style.color = "white";
-            actionDup.style.color = "white";
+            actionCle.style.color = "white";
             actionEdi.style.color = "white";
             actionFav.style.cursor = "pointer";
             actionDel.style.cursor = "pointer";
-            actionDup.style.cursor = "pointer";
+            actionCle.style.cursor = "pointer";
             actionEdi.style.cursor = "pointer";
         }
         else {
             selectedTitle.innerHTML = selectedItems.length + " items selected";
             actionFav.style.color = "white";
             actionDel.style.color = "white";
-            actionDup.style.color = "white";
+            actionCle.style.color = "white";
             actionEdi.style.color = "rgb(201, 201, 201)";
             actionFav.style.cursor = "pointer";
             actionDel.style.cursor = "pointer";
-            actionDup.style.cursor = "pointer";
+            actionCle.style.cursor = "pointer";
             actionEdi.style.cursor = "not-allowed";
         }
     }
@@ -719,7 +719,7 @@ function colorPicker(number) {
 async function selectColor(color, alternate) {
     var colorbutton = document.getElementById(alternate + 'colorbutton');
     var priceLabel = document.getElementById(alternate + 'price');
-    var typeRarityLabel = document.getElementById('typerarity');
+    var isBM = document.getElementById('edititem-name').getAttribute("isBM");
 
     if(alternate != "") var colorpicker = document.getElementById('colorpicker1');
     else var colorpicker = document.getElementById('colorpicker');
@@ -730,16 +730,12 @@ async function selectColor(color, alternate) {
     $("#" + alternate +"itemimage").animate({ opacity: 0 }, "fast");
     var itemNameSearch = itemnameLabel.innerText.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
     var itemImageURL = await doItemRequest(itemNameSearch, "/" + color.replace("default", ""), true);
-    if(typeRarityLabel.innerText.includes("Black Market")) {
+    if(isBM) {
         itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<video src=\"https://img.rl.insider.gg/itemPics/mp4/") + 12);
-        itemImageURL = itemImageURL.substring(0, itemImageURL.indexOf('"'));
-        itemImage.src = itemImageURL;
-
     } else {
         itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
-        itemImageURL = itemImageURL.substring(0, itemImageURL.indexOf('"'));
-        itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
     }
+    itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
     try {
     } catch (error) {
         var errorLogsPath = (electron.app || electron.remote.app).getPath('userData') + "/data/errorlogs.json";

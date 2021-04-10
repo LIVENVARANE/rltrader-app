@@ -105,6 +105,7 @@ async function editItemWindow(itemToLoad) {
         var isBM = getKeyForItem(itemToLoad, "itemType").includes("Black Market");
 
         itemNameLabel.innerText = itemName;
+        itemNameLabel.setAttribute("isBM", isBM); //will help when changing item color
         
         if(isBM) { //if item is a bm, rlinsider now only has mp4 videos of the item
             var videoElement = document.createElement('video');

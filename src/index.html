@@ -25,6 +25,12 @@
             </div>
         </div>
     </div>
+    <div id="update-available">
+        <img src="assets/ball-little.png" />
+        <h1>An update is available!</h1>
+        <h2>RLTrader will restart once the update is installed</h2>
+        <h5 id="update-app-version"></h5>
+    </div>
     <body>
         <header>
             <img src="assets/ball-little.png"/>
@@ -86,6 +92,7 @@
             <div id="settings-page"><i class="fas fa-times close" onclick="settingsWindow()"></i>
                 <div class="navbar">
                     <h2>Settings</h2>
+                    <h4 id="settings-app-version"></h4>
                     <span onclick="navSettings('general')"><a><i class="fas fa-cogs"></i> General</a></span>
                     <span onclick="navSettings('account')"><a><i class="fas fa-user-circle"></i> Account</a></span>
                     <span onclick="navSettings('dashboard')"><a><i class="fas fa-home"></i> Dashboard</a></span>
@@ -195,10 +202,10 @@
         <div class="separator"></div>
         <span id="selectedtitle"><i>No item selected</i></span>
         <div class="right">
-            <span class="f-action" id="actionFav" onclick="doItemAction('fav')"><i class="far fa-star"></i></i></span>
-            <span class="f-action" id="actionDel" onclick="doItemAction('del')"><i class="far fa-trash-alt"></i></span>
-            <span class="f-action" id="actionDup" onclick="doItemAction('dup')"><i class="far fa-clone"></i></span>
-            <span class="f-action" id="actionEdi" onclick="doItemAction('edi')" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
+            <span class="f-action" title="Clear selected items" id="actionCle" onclick="doItemAction('cle')"><i class="fas fa-times"></i></span>
+            <span class="f-action" title="Switch item favorite mode" id="actionFav" onclick="doItemAction('fav')"><i class="far fa-star"></i></i></span>
+            <span class="f-action" title="Delete selected items" id="actionDel" onclick="doItemAction('del')"><i class="far fa-trash-alt"></i></span>
+            <span class="f-action" title="Edit an item" id="actionEdi" onclick="doItemAction('edi')" style="margin-right: 25px;"><i class="far fa-edit"></i></span>
             <div class="separator"></div>
             <span class="new-item" onclick="addItemWindow()">ADD NEW ITEM</span>
             <div class="separator"></div>
