@@ -733,13 +733,11 @@ async function selectColor(color, alternate) {
     $("#" + alternate +"itemimage").animate({ opacity: 0 }, "fast");
     var itemNameSearch = itemnameLabel.innerText.replace(" : ", "_").replace("-", "_").replaceAll(" ", "_").replace(":", "");
     var itemImageURL = await doItemRequest(itemNameSearch, "/" + color.replace("default", ""), true);
-    console.log(itemImageURL);
     if(isBM_edit || isBM_add) {
         itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<video src=\"https://img.rl.insider.gg/itemPics/mp4/") + 12);
     } else {
         itemImageURL = itemImageURL.substring(itemImageURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
     }
-    console.log(itemImageURL);
     itemImage.src = itemImageURL.substring(0, itemImageURL.indexOf('"'));
     try {
     } catch (error) {
