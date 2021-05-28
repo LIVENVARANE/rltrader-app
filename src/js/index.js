@@ -63,6 +63,58 @@ function pageLoad() {
                     itemDiv.align = "left";
                     itemDiv.id = "db-item" + item.id;
                     itemDiv.setAttribute("onclick", "selectItem(" + item.id + ")");
+                
+                    var contextmenu = document.getElementById('contextmenu');
+                    itemDiv.addEventListener('contextmenu', function(e) {
+                        var x = e.clientX;
+                        var y = e.clientY;
+                    
+                        if(y > 550) { //cursor is in under the y half of the app
+                            y = y - 179;
+                        }
+                        if(x > 850) { //cursor is in the right half of the app
+                            x = x - 272;
+                        }
+
+                        contextmenu.style.top = y + "px";
+                        contextmenu.style.left = x + "px";
+                        contextmenu.style.display = "block";
+                        contextmenu.style.opacity = 1;
+                        contextmenu.innerHTML = "";
+                        for (var i = 0; i < 5; i++) {
+                            var liElement = document.createElement('li');
+                            switch(i) {
+                                case 0:
+                                    liElement.innerHTML = '<i class="fas fa-chart-bar"></i>See item info & graph';
+                                    liElement.setAttribute('onclick', 'itemInfoWindow(\'' + item.id + '\')');
+                                    break;
+                                case 1:
+                                    liElement.innerHTML = '<img src="assets/icons/rlinsider-black.png" />See item on rl.insider.gg';
+                                    liElement.setAttribute('onclick', "shell.openExternal('https://rl.insider.gg/en/pc/" + item.name.replaceAll(" : ", "_").replaceAll(":", "").replaceAll(" ", "_").toLowerCase() + "/" + item.color + "')");
+                                    break;
+                                case 2:
+                                    liElement.innerHTML = '<i class="fas fa-star"></i>Add/Remove item to favorites';
+                                    liElement.setAttribute('onclick', 'doItemAction(\'fav\', \'' + item.id + '\')');
+                                    break;
+                                case 3:
+                                    liElement.innerHTML = '<i class="far fa-edit"></i>Edit item';
+                                    liElement.setAttribute('onclick', 'doItemAction(\'edi\', \'' + item.id + '\')');
+                                    break;
+                                case 4:
+                                    liElement.innerHTML = '<i class="far fa-trash-alt"></i>Delete item';
+                                    liElement.setAttribute('onclick', 'doItemAction(\'del\', \'' + item.id + '\')');
+                            }
+                            $('#inv-container').children('div').each(function () {
+                                var itemId = $(this).attr('id');
+                                if(document.getElementById(itemId).id.includes("db-item")) {
+                                    document.getElementById(itemId).style.backgroundColor = "rgb(238, 238, 238)";
+                                }
+                            });
+                            itemDiv.style.backgroundColor = "#dadada";
+                            contextmenu.appendChild(liElement);
+                        }
+                    });
+
                     invContainer.appendChild(itemDiv);
 
                     var infoDiv = document.createElement('div');
@@ -75,6 +127,13 @@ function pageLoad() {
                     itemImage.setAttribute("autoplay", "");
                     itemImage.setAttribute("loop", "");
                     itemImage.setAttribute("draggable", "false");
+                    if(item.displayColor != "Default") {
+                        if(!item.itemType.includes("Limited") && !item.itemType.includes("Boost") && !item.itemType.includes("Wheel")) {
+                            itemImage.style.borderTopRightRadius = "3px";
+                        } else if(item.itemType.includes("Decal") || item.itemType.includes("Wheel")) {
+                            itemImage.style.borderTopRightRadius = "3px";
+                        }
+                    }
                     itemDiv.appendChild(itemImage);
 
                     var itemName = document.createElement('span');
@@ -119,9 +178,15 @@ function pageLoad() {
                     selectContainer.id = "db-item-cb" + item.id;
                     itemDiv.appendChild(selectContainer);
 
+                    var chartDiv = document.createElement('div');
+                    chartDiv.className = "itemchart";
+                    chartDiv.id = "db-chart" + item.id;
+                    itemDiv.appendChild(chartDiv);
+
                     setPriceForItemBubble(item.name, item.color, item.lastCreditPrice, itemPrice, itemPercent, item.id);
                 
                 });
+
                 $("#inv-container").append("<br /><br /><br /><br />");
 
                 new Sortable(invContainer, {
@@ -137,6 +202,7 @@ function pageLoad() {
                         console.log("Saved order changes for inventory");
                     },
                     onMove: function() {
+                        closeContextMenu();
                         if(document.getElementById("favorite-sorting-icon").className == "fas fa-star") return false;
                     }
                 });
@@ -150,7 +216,7 @@ function pageLoad() {
                 }
                 if(!userDataContent.settings.headerAnimationSetting) {
                     document.getElementById("header-span-anim").style.opacity = 0;
-                    document.getElementById("header-span-noanim").style.opacity = 1;
+                    document.getElementById("header-span-noanim").style.opacity = 0.9;
                 }
                 if(userDataContent.settings.dashboardItemStyle == "list") changeInventorySortingType();
                 if(userDataContent.settings.isShowingOnlyFavorites == true) changeOnlyFavoriteMode();
@@ -197,6 +263,12 @@ function startListeners() {
         
         editItemWindow();
     });
+    $('#infowindow').on('click', function(e) {
+        if (e.target !== this)
+          return;
+        
+        itemInfoWindow();
+    });
     document.addEventListener("keyup", function(event) {
         if(event.key == "Escape") {
             if(document.getElementById("edititemwindow").style.visibility == "visible") {
@@ -210,6 +282,9 @@ function startListeners() {
                 addItemWindow();
             }
         }
+    });
+    document.addEventListener("click", function() {
+        closeContextMenu();
     });
 }
 
@@ -234,10 +309,40 @@ function bringItemToFront(id) {
     fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
 }
 
-function doItemAction(type) {
+function doItemAction(type, item) {
+    var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
+    var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
+    if(item !== undefined) {
+        switch(type) {
+            case "fav":
+                var isFav = getKeyForItem(item, "isFavorite");
+                if(isFav) modifyKeyForItem(item, "isFavorite", false);
+                else modifyKeyForItem(item, "isFavorite", true);
+                document.getElementById("db-item-cb" + item).innerHTML = '<i class="far fa-square"></i>';
+                document.getElementById("db-item-cb" + item).style.opacity = 0;
+                showAlert("Item" + isMult + " added/removed from favorites", "#2ecc71");
+                break;
+            case "del":
+                var i = 0;
+                userDataContent.inventory.forEach(inv_item => {
+                    if(item == inv_item.id) {
+                        userDataContent.inventory.splice(i, 1);
+                        $("#db-item" + item).fadeOut("fast", function() {
+                            document.getElementById("db-item" + item).remove();
+                        });
+                    }
+                    i++;
+                });
+                fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
+                showAlert("Item removed from your inventory", "#2ecc71");
+                break;
+            case "edi":
+                editItemWindow(item);
+                break;
+        }
+        return;
+    }
     if(selectedItems.length != 0) {
-        var userDataPath = (electron.app || electron.remote.app).getPath('userData') + "/data/userdata.json";
-        var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
         switch(type) {
             case "fav":
                 selectedItems.forEach(itemId => {
@@ -291,6 +396,7 @@ function doItemAction(type) {
 var selectedItems = [];
 
 function selectItem(id) {
+    if(document.getElementById("contextmenu").style.display == "block") return;
     var itemCheckbox = document.getElementById("db-item-cb" + id);
     var selectedTitle = document.getElementById("selectedtitle");
     var actionFav = document.getElementById("actionFav");
@@ -389,7 +495,7 @@ function selectItem(id) {
         }
     }
 }
-
+//also setting chart
 async function setPriceForItemBubble(name, color, oldPrice, priceSpan, pricePercent, id) {
     var reqName = name.replace(" :", "").replaceAll(" ", "_").replace("-", "_").replace(":", "");
     var reqColor;
@@ -398,7 +504,8 @@ async function setPriceForItemBubble(name, color, oldPrice, priceSpan, pricePerc
     } else {
         reqColor = "/" + color;
     }
-    var price = await doItemRequest(reqName, reqColor, "currentPriceRange") + " Cr";
+    var emptyReq = JSON.parse(await doItemRequest(reqName, reqColor, "empty"));
+    var price = emptyReq['currentPriceRange'] + ' Cr';
     var priceChange = "No change";
     if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
     if(price == "no Cr") price = "Error";
@@ -438,6 +545,102 @@ async function setPriceForItemBubble(name, color, oldPrice, priceSpan, pricePerc
         }
     }
     pricePercent.innerHTML = priceChange;
+
+    //chart
+    var options = {
+        series: [
+            {
+                name: 'Max Cr',
+                data: getPricesHistory(2, emptyReq, 2)
+            },
+            {
+                name: 'Min Cr',
+                data: getPricesHistory(0, emptyReq, 2)
+            }
+        ],
+        chart: {
+            id: 'area-datetime',
+            type: 'area',
+            height: 120,
+            width: 450,
+            toolbar: {
+                show: false,
+            },
+            zoom: {
+                enabled: false,
+                autoScaleYaxis: true
+            },
+        },
+        colors: ['#ADADAD', '#BC7C9C'],
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'straight'
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+            opacityFrom: 0.6,
+            opacityTo: 0.8,
+            }
+        },
+        legend: {
+            show: false
+        },
+        xaxis: {
+            type: 'datetime',
+            labels: {
+            show: false
+            }
+        },
+        yaxis: {
+            labels: {
+            show: false
+            }
+        },
+        tooltip: {
+            x: {
+            format: "dd MMMM yyyy"
+            }
+        },
+        annotations: {
+            xaxis: [{
+                x: new Date(getKeyForItem(id, 'addedTimestamp')).getTime(),
+                borderColor: '#999',
+                yAxisIndex: 0,
+                label: {
+                    show: true,
+                    text: 'Added',
+                    style: {
+                        color: '#fff',
+                        background: '#BC7C9C'
+                    }
+                }
+            }]
+        },
+    };
+    
+    var chart = new ApexCharts(document.querySelector("#db-chart" + id), options);
+    chart.render();
+}
+
+var getPricesHistory = function(n, itemData, time) { //n is the number which makes if its max or min, time says if its all time, 3 months etc
+    var series = [];
+    var x;
+    var y;
+
+    if (itemData['itemHistoryData'][time] !== undefined) { //if item has data
+        itemData['itemHistoryData'][time]['pointInfo'].forEach(element => {
+            var date = new Date(0);
+            
+            x = date.setUTCSeconds(element["timestamp"]);
+            y = element["price"][n];
+            series.push([x, y]);
+        })
+    }
+    
+    return series;
 }
 
 function getKeyForItem(id, key) {
@@ -639,11 +842,11 @@ async function editPriceType(option) {
                 document.getElementById("editprice").innerText = "Loading...";               
                 var color = document.getElementById("editcolorbutton").innerText.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue");
 
-                if(color == "default") {
-                    var itemPrice = await doItemRequest(document.getElementById("edititem-name").innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
-                } else {
-                    var itemPrice = await doItemRequest(document.getElementById("edititem-name").innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
-                }
+                var itemSearch = document.getElementById("edititem-name").innerHTML.replaceAll(" ", "_").replace("-", "_").replace(":", "_").replace("__", "_");
+                color =  '/' + color;
+                color = color.replace('/default', '');
+                var itemPrice = JSON.parse(await doItemRequest(itemSearch, color, 'empty'));
+                itemPrice = itemPrice['currentPriceRange'] + ' Cr';
 
                 document.getElementById("editprice").innerText = itemPrice;
                 
@@ -830,11 +1033,14 @@ async function selectColor(color, alternate) {
     $(colorpicker1).animate({ opacity: 0 }, "fast", function() {
         colorpicker.style.visibility = "hidden";
     });
-    if(color == "default") {
-        var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace(":_", "").replace("-", "_").replace(":", "_").replace("__", "_"), "", "currentPriceRange") + " Cr";
-    } else {
-        var itemPrice = await doItemRequest(itemnameLabel.innerHTML.replaceAll(" ", "_").replace(":_", "").replace("-", "_").replace(":", "_").replace("__", "_"), "/" + color, "currentPriceRange") + " Cr";
-    }
+
+    var itemSearch = itemnameLabel.innerHTML.replaceAll(" ", "_").replace(":_", "_").replace("-", "_").replace(":", "_").replace("__", "_");
+
+    if(color == 'default') var itemPrice = JSON.parse(await doItemRequest(itemSearch, '', 'empty'));
+    else var itemPrice = JSON.parse(await doItemRequest(itemSearch, '/' + color, 'empty'));
+    
+    itemPrice = itemPrice['currentPriceRange'] + ' Cr';
+
     if(alternate == "edit") {
         editPriceType(2);
     }
@@ -908,7 +1114,7 @@ function addItemToInventory() {
                         break;
                 }
 
-                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.idIncrement + 1, "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "itemType":document.getElementById('typerarity').innerText, "lastCreditPrice":price, "isFavorite":false});
+                userDataContent.inventory.push({"name":itemnameLabel.innerText, "id":userDataContent.idIncrement + 1, "addedTimestamp": Date.now(), "color":color,"displayColor":colorbutton.innerText, "cssColor":colorbutton.style.backgroundColor, "itemImage":document.getElementById('itemimage').src, "itemType":document.getElementById('typerarity').innerText, "lastCreditPrice":price, "isFavorite":false});
                 userDataContent.idIncrement++;
                 fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
                 console.log("Added item: \"" + itemnameLabel.innerText + "\" to inventory.");
@@ -971,7 +1177,7 @@ function setSettingValue(setting, value) {
                 });
             } else {
                 document.getElementById("header-span-anim").style.opacity = 0;
-                document.getElementById("header-span-noanim").style.opacity = 1;
+                document.getElementById("header-span-noanim").style.opacity = 0.9;
             }
             break;
         case "dashboardItemBorderColor":
@@ -998,16 +1204,16 @@ function changeOnlyFavoriteMode() {
     var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
     var displayValue;
 
-    if(favoriteIcon.className == "far fa-star") { //not enabled, will enable
+    if(favoriteIcon.className == "far fa-star important") { //not enabled, will enable
         $("#favorite-sorting-icon").animate({ opacity: 0 }, "fast", function() {
-            favoriteIcon.className = "fas fa-star";
+            favoriteIcon.className = "fas fa-star important";
             $("#favorite-sorting-icon").animate({ opacity: 0.8 }, "fast");
         });
         displayValue = "none"; 
         userDataContent.settings.isShowingOnlyFavorites = true;
     } else { //enabled, will disable
         $("#favorite-sorting-icon").animate({ opacity: 0 }, "fast", function() {
-            favoriteIcon.className = "far fa-star";
+            favoriteIcon.className = "far fa-star important";
             $("#favorite-sorting-icon").animate({ opacity: 0.8 }, "fast");
         });
         if(sortingType.className == "fas fa-th-large") displayValue = "inline-flex";
@@ -1031,6 +1237,17 @@ function changeOnlyFavoriteMode() {
         }
     });
     console.log("Settings updated.");
+
+    if(document.getElementById("sorting-type-icon").className == "fas fa-th-large important" && displayValue != 'none') { //if not in list mode
+        $('#inv-container').children('div').each(function () {
+            var itemId = $(this).attr('id');
+            if(document.getElementById(itemId).id.includes("db-item")) {
+                if(document.getElementById(itemId).style.display != "none") {
+                    document.getElementById(itemId).style.display = "inline-flex";
+                }
+            }
+        });
+    }
 }
 
 function changeInventorySortingType() {
@@ -1039,10 +1256,13 @@ function changeInventorySortingType() {
     var userDataContent = JSON.parse(fs.readFileSync(userDataPath, 'utf-8').toString());
 
     $("#inv-container").animate({ opacity: 0 }, "fast", function() {
-        if(sortingTypeIcon.className == "fas fa-th-large") { //list mode
+        if(sortingTypeIcon.className == "fas fa-th-large important") { //list mode
+            document.getElementById('sorting-type-icon').className = document.getElementById('sorting-type-icon').className.replace('important', '');
             $("#sorting-type-icon").animate({ opacity: 0 }, "fast", function() {
                 sortingTypeIcon.className = "fas fa-th-list";
-                $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
+                $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast", function() {
+                    document.getElementById('sorting-type-icon').className = 'fas fa-th-list important';
+                });
             });
             userDataContent.settings.dashboardItemStyle = "list";
             fs.writeFileSync(userDataPath, JSON.stringify(userDataContent, null, 4));
@@ -1059,6 +1279,7 @@ function changeInventorySortingType() {
                 }
             });
             $(".itemimage").css("width", "70px");
+            $(".itemimage").css("height", "70px");
             $(".itemimage").css("margin-left", "35px");
             $(".info").css("display", "inline");
             $(".info").css("bottom", "10px");
@@ -1089,10 +1310,11 @@ function changeInventorySortingType() {
             $(".selectcontainer").css("color", "black");
             $(".selectsquare").css("top", "0px");
             $(".selectsquare").css("color", "black");
+            $(".itemchart").css("display", "block");
     
         } else { //bubbles mode
             $("#sorting-type-icon").animate({ opacity: 0 }, "fast", function() {
-                sortingTypeIcon.className = "fas fa-th-large";
+                sortingTypeIcon.className = "fas fa-th-large important";
                 $("#sorting-type-icon").animate({ opacity: 0.8 }, "fast");
             });
             userDataContent.settings.dashboardItemStyle = "bubbles";
@@ -1110,6 +1332,7 @@ function changeInventorySortingType() {
                 }
             });
             $(".itemimage").css("width", "100px");
+            $(".itemimage").css("height", "100px");
             $(".itemimage").css("margin-left", "");
             $(".info").css("display", "block");
             $(".info").css("bottom", "");
@@ -1140,6 +1363,7 @@ function changeInventorySortingType() {
             $(".selectcontainer").css("color", "");
             $(".selectsquare").css("color", "white");
             $(".selectsquare").css("top", "70px");
+            $(".itemchart").css("display", "none");
 
             //backing bubbles checkboxes opacity behavior to normal
             selectedItems.forEach(id => {
@@ -1149,6 +1373,22 @@ function changeInventorySortingType() {
         $("#inv-container").animate({ opacity: 1 }, "fast");
     });
     console.log("Settings updated.");
+}
+
+function closeContextMenu() {
+    var contextmenu = document.getElementById('contextmenu');
+    if(contextmenu.style.display == "block") {
+        contextmenu.style.opacity = 0;
+        $('#inv-container').children('div').each(function () {
+            var itemId = $(this).attr('id');
+            if(document.getElementById(itemId).id.includes("db-item")) {
+                document.getElementById(itemId).style.backgroundColor = "rgb(238, 238, 238)";
+            }
+        });
+        setTimeout(function() {
+            contextmenu.style.display = "none";
+        }, 200);
+    }
 }
 
 function resetInventory() {

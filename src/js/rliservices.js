@@ -124,56 +124,46 @@ async function searchForItem() {
         var stockAC = availableColors.toLowerCase().replace("titanium white", "white").replace("forest green", "fgreen").replace("burnt sienna", "sienna").replace("sky blue", "sblue").substring(1);
         var stockAC_withDefault = stockAC; //before removing default
         if(stockAC == " default") {
-            var itemname = await doItemRequest(itemsearch, "", "itemName"); //we take the first color that is available because we just want the name (the color will not change the item name)
-            var blankRequest = await doItemRequest(itemsearch, "", true);
+            var emptyReq = JSON.parse(await doItemRequest(itemsearch, "", "empty"));
         } else {
             stockAC = stockAC.replace("default", "");
-            var itemname = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], "itemName"); //we take the first color that is available because we just want the name (the color will not change the item name)
-            var blankRequest = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+            var emptyReq = JSON.parse(await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], "empty"));
         }
 
-        var decalCar = blankRequest.substring(blankRequest.indexOf("<title>") + 7);
-        decalCar = decalCar.substring(0, decalCar.indexOf("</title>"));
-        if(decalCar.includes("[")) {
-            decalCar = decalCar.substring(decalCar.indexOf("[") + 1);
-            decalCar = decalCar.substring(0, decalCar.indexOf("]")) + ": ";
-        } else {
-            decalCar = "";
-        }
+        itemname = emptyReq['itemName'];
+
+        //decalCar gives the car the decal is made for (if applicable, otherwise its an empty string)
+        var decalCar = emptyReq['itemNameTranslated_base'];
+        if(decalCar == null) decalCar = '';
+        else decalCar = decalCar + ': ';
 
         if(itemcolor == "") {
             if(stockAC_withDefault.includes("default")) {
-                var itemPicURL = await doItemRequest(itemsearch, "", true);
+                var blankRequest = await doItemRequest(itemsearch, "", true);
             } else {
-                var itemPicURL = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+                var blankRequest = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
             }
         } else if(stockAC.includes(itemcolor.replace("/", ""))) {
-            var itemPicURL = await doItemRequest(itemsearch, itemcolor, true);
+            var blankRequest = await doItemRequest(itemsearch, itemcolor, true);
         } else {
-            var itemPicURL = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
+            var blankRequest = await doItemRequest(itemsearch, "/" + stockAC.split(" ")[0], true);
         }
 
         var rarity = blankRequest;
         var type = blankRequest;
-        var specialEditionName = blankRequest.substring(blankRequest.indexOf("<title>") + 7);
-        specialEditionName = specialEditionName.substring(0, specialEditionName.indexOf("</title>"));
-        if(specialEditionName.includes(": ")) {
-            specialEditionName = specialEditionName.substring(specialEditionName.indexOf(": ") + 2);
-            specialEditionName = specialEditionName.substring(0, specialEditionName.indexOf(" on "));
-            specialEditionName = " : " + specialEditionName;
-        } else {
-            specialEditionName = "";
-        }
+        var specialEditionName = emptyReq['itemNameTranslated_edition'];
+        if(specialEditionName == null) specialEditionName = '';
+        else specialEditionName = ' : ' + specialEditionName;
         
         rarity = rarity.substring(rarity.indexOf("<td>Rarity</td><td>") + 19);
         rarity = rarity.substring(0, rarity.indexOf('</td></tr><tr><td>Type</td>'));
         type = type.substring(type.indexOf("<td>Type</td><td>") + 17)
         type = type.substring(0, type.indexOf('</td></tr><tr><td>Series</td>'));
         if(rarity.includes("Black Market")) {
-            itemPicURL = itemPicURL.substring(itemPicURL.indexOf("<video src=\"https://img.rl.insider.gg/itemPics/mp4/") + 12);
+            itemPicURL = blankRequest.substring(blankRequest.indexOf("<video src=\"https://img.rl.insider.gg/itemPics/mp4/") + 12);
             itemPicURL = itemPicURL.substring(0, itemPicURL.indexOf('"'));
         } else {
-            itemPicURL = itemPicURL.substring(itemPicURL.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
+            itemPicURL = blankRequest.substring(blankRequest.indexOf("<img src=\"https://img.rl.insider.gg/itemPics/large/") + 10);
             itemPicURL = itemPicURL.substring(0, itemPicURL.indexOf('"'));
         }
 
@@ -298,7 +288,7 @@ async function searchForItem() {
                     itemcolor = ""; //for the price var just under
             }
 
-            var price = await doItemRequest(itemsearch, itemcolor, "currentPriceRange") + " Cr"; //will set the price for the color the user has specified
+            var price = emptyReq['currentPriceRange']; //will set the price for the color the user has specified
             if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
         }
         else {
@@ -306,7 +296,8 @@ async function searchForItem() {
                 colorbutton.innerHTML = "Default";
                 colorbutton.style.background = "#313131";
                 colorbutton.style.color = "white";
-                var price = await doItemRequest(itemsearch, "", "currentPriceRange") + " Cr"; //getting the price for the default color
+                var price = JSON.parse(await doItemRequest(itemsearch, '', 'empty'));
+                price = price['currentPriceRange'] + ' Cr'; //getting the price for the default color
                 if(price == "No price yet. Cr") { price = price.replace(" Cr", ""); }
             } else {
                 colorbutton.innerHTML = "Choose a color";
@@ -343,6 +334,11 @@ function doItemRequest(item, color, specifier) { //item found, will output color
         http.setRequestHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
         http.setRequestHeader("accept-language", "en-US;q=0.9,en;q=0.8");
         http.send();
+        
+        http.onerror = function() {
+            showAlert("There where an error while getting item info, please verify your internet connection.", "#e74c3c");
+            return;
+        }
 
         http.onreadystatechange = function() {
             if(this.readyState == 4 && this.status == 200) {
@@ -358,9 +354,10 @@ function doItemRequest(item, color, specifier) { //item found, will output color
                                 resp = resp.substring(resp.lastIndexOf(",\"itemColor\":\"") + 14);
                                 resolve(resp.substring(0, resp.indexOf('"')));
                             }
-                        } else {
-                            resp = resp.substring(resp.lastIndexOf("\"" + specifier + "\":\"") + (4 + specifier.length));
-                            resolve(resp.substring(0, resp.indexOf('"')));
+                        }
+                        else if(specifier == "empty") {
+                            resp = resp.substring(resp.indexOf("var itemData = {") + 15);
+                            resolve(resp.substring(0, resp.indexOf("};")) + "}");
                         }
                     } else { //this item with this color does not exists
                         resolve("no");

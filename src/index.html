@@ -7,6 +7,7 @@
         <script src="js/windows.js"></script>
         <script src="js/rliservices.js"></script>
         <script src="js/Sortable.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js" type="text/javascript"></script>
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     </head>
@@ -31,19 +32,21 @@
         <h2>RLTrader will restart once the update is installed</h2>
         <h5 id="update-app-version"></h5>
     </div>
+    <div id="contextmenu">
+    </div>
     <body>
         <header>
             <img src="assets/ball-little.png"/>
-            <span id="header-span-anim" style="opacity: 1;">RLTrader</span>
+            <span id="header-span-anim" style="opacity: 0.8;">RLTrader</span>
             <span id="header-span-noanim" style="opacity: 0;">RLTrader</span>
             <i class="control-btn close" onclick="ipcRenderer.send('close_app');"><span>×</span></i>
             <i class="control-btn minimize" onclick="ipcRenderer.send('minimize_app');" style="border-radius: 10px 0px 0px 10px;"><span>−</span></i>
             <i class="fas fa-cog settings-btn" onclick="settingsWindow()"></i>
-            <i class="fas fa-th-large" id="sorting-type-icon" onclick="changeInventorySortingType()"></i>
-            <i class="far fa-star" id="favorite-sorting-icon" onclick="changeOnlyFavoriteMode()"></i>
+            <i class="fas fa-th-large important" id="sorting-type-icon" onclick="changeInventorySortingType()"></i>
+            <i class="far fa-star important" id="favorite-sorting-icon" onclick="changeOnlyFavoriteMode()"></i>
         </header>
         <div align="center">
-            <div id="inv-container"></div>
+            <div id="inv-container" onscroll="closeContextMenu()"></div>
             <div class="bottom-gradient"></div>
             <div id="inv-tutorial">Your inventory is empty.<h4>Add item by clicking <a onclick="addItemWindow()">here</a> or the 'ADD NEW ITEM' button!</h4></div>
         </div>
@@ -65,22 +68,22 @@
                     <h2 id="typerarity">Rarity: An error happened</h2><br />
                     <div class="colorcontainer">
                         <h2>Selected color: <span id="colorbutton" title="Click here to change color" onclick="colorPicker('');">An error happened</span></h2><div id="colorpicker">
-                            <li style="text-align: center; display: list-item; border-radius: 5px 5px 0px 0px; font-weight: bold; padding: 7px 0px; color: white; background: linear-gradient(to right, #4776E6, #8e54e9); cursor: default;">Available Colors</li>
+                            <li>Available Colors</li>
                             <li id="cp-black" class="listitem" style="background-color: black; color: white;">Black</li>
-                            <li id="cp-white" class="listitem" style="background-color: #dbdbdb;">Titanium White</li>
+                            <li id="cp-white" class="listitem" style="background-color: #dbdbdb;">White</li>
                             <li id="cp-grey" class="listitem" style="background-color: grey;">Grey</li>
                             <li id="cp-crimson" class="listitem" style="background-color: #de1b1b;">Crimson</li>
                             <li id="cp-pink" class="listitem" style="background-color: pink;">Pink</li>
                             <li id="cp-cobalt" class="listitem" style="background-color: #1b5cde;">Cobalt</li>
                             <li id="cp-sblue" class="listitem" style="background-color: #09e9ed;">Sky Blue</li>
-                            <li id="cp-sienna" class="listitem" style="background-color: brown;">Burnt Sienna</li>
+                            <li id="cp-sienna" class="listitem" style="background-color: brown;">Sienna</li>
                             <li id="cp-saffron" class="listitem" style="background-color: yellow;">Saffron</li>
                             <li id="cp-lime" class="listitem" style="background-color: #07eb12;">Lime</li>
-                            <li id="cp-fgreen" class="listitem" style="background-color: #0d7522;">Forest Green</li>
+                            <li id="cp-fgreen" class="listitem" style="background-color: #0d7522;">Green</li>
                             <li id="cp-orange" class="listitem" style="background-color: orange;">Orange</li>
                             <li id="cp-purple" class="listitem" style="background-color: purple;">Purple</li>
                             <li id="cp-default" class="listitem" style="background-color: rgb(49, 49, 49); color: white;">Default</li>
-                            <li style="text-align: center; display: list-item; border-radius: 0px 0px 5px 5px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9);" onclick="colorPicker('');"><u>Close</u></li>
+                            <li onclick="colorPicker('');"><u>Close</u></li>
                         </div>
                     </div>
                     <div class="ie-footer">
@@ -128,7 +131,7 @@
                     </div>
                     <div id="s-credits" style="display: none;">
                         <h2>Credits</h2>
-                        <h5>Thank you for using RLTrader !<br />This software has entierly been made by LIVEN (with love).<br />All the items prices and informations are from and belongs to RLInsider and all Rocket League material belongs to Psyonix, Inc. RLTrader have no rights to the game Rocket League and the website RLInsider.<br /><br />Thanks !</h5>
+                        <h5>Thank you for using RLTrader !<br />This software has entierly been made by LIVEN (with love).<br />All the items prices and informations are from and belongs to Insider Analytics, LLC (RL.Insider) and all Rocket League material belongs to Psyonix, Inc. RLTrader have no rights to the game Rocket League and the website rl.insider.gg.<br /><br />Thanks !</h5>
                         <h3>Links</h3>
                         <ul>
                             <li><a title="Not done yet." style="cursor: not-allowed;">RLTrader website</a></li>
@@ -153,7 +156,7 @@
                     <img src="" id="edititemimage" />
                     <h2 id="edititem-name" style="font-weight: bold; left: 0px;">Loading..</h3><br />
                     <h2 style="margin-left: 3px;">Color: <span id="editcolorbutton" title="Click here to change color" onclick="colorPicker('1');">An error happened</span></h2><div id="colorpicker1" style="visibility: hidden;">
-                        <li id="edit-title" style="text-align: center; display: list-item; border-radius: 5px 5px 0px 0px; font-weight: bold; padding: 7px 0px; color: white; background: linear-gradient(to right, #4776E6, #8e54e9); cursor: default;">Available Colors</li>
+                        <li id="edit-title">Available Colors</li>
                         <li id="cp1-black" class="editlistitem" style="background-color: black; color: white;">Black</li>
                         <li id="cp1-white" class="editlistitem" style="background-color: #dbdbdb;">Titanium White</li>
                         <li id="cp1-grey" class="editlistitem" style="background-color: grey;">Grey</li>
@@ -168,7 +171,7 @@
                         <li id="cp1-orange" class="editlistitem" style="background-color: orange;">Orange</li>
                         <li id="cp1-purple" class="editlistitem" style="background-color: purple;">Purple</li>
                         <li id="cp1-default" class="editlistitem" style="background-color: rgb(49, 49, 49); color: white;">Default</li>
-                        <li style="text-align: center; display: list-item; border-radius: 0px 0px 5px 5px; font-weight: bold; color: white; background: linear-gradient(to right, #4776E6, #8e54e9);" onclick="colorPicker('1');"><u>Close</u></li>
+                        <li Onclick="colorPicker('1');"><u>Close</u></li>
                     </div><br />
                     <div id="editfav" onclick="editFav()">Favorite: <span id="editfav-indicator"><i class="fas fa-times"></i></span></div>
                     <div class="edit-ie-footer">
@@ -198,13 +201,31 @@
                 </div>
             </div>
         </div>
+        <div id="infowindow"> <!-- ITEM INFO WINDOW HERE -->
+            <div id="info-page"><i class="fas fa-times close" onclick="itemInfoWindow()"></i>
+                <div class="info-header" align="left">
+                    <img src="" id="infoimage" />
+                    <div class="text">
+                        <i id="infofavorite" title="Favorite"></i><h1 id="infoname">Error</h1>
+                        <h4><span id="infocolor" title="Item color">Error</span><span id="inforarity" title="Item rarity and type">Error</span><span id="infonumber" title="Item number">Error</span><span id="infotime" title="Date of addition of the item">Error</span></h4>
+                    </div>
+                </div>
+                <div id="itemchart"></div>
+                <button onclick="loadItemWindowChart(null, null, 3);" id="info-ad">ALL DATA</button>
+                <button onclick="loadItemWindowChart(null, null, 2);" id="info-tm">3 MONTHS</button>
+                <button onclick="loadItemWindowChart(null, null, 1);" id="info-tw">2 WEEKS</button>
+                <button onclick="loadItemWindowChart(null, null, 0);" id="info-td">3 DAYS</button>
+                <h3>Price right now: <span id="infoprice">Error</span></h3>
+                <div class="info-btn" onclick="itemInfoWindow()"><i class="fas fa-check"></i></div>
+            </div>
+        </div>
     </div>
     <footer style="bottom: 23px;">
-        <span style="font-weight: bold; line-height: 3;" id="f-username"></span>
+        <span id="f-username"></span>
         <div class="separator"></div>
         <span id="selectedtitle"><i>No item selected</i></span>
         <div class="right">
-            <span class="f-action" title="Clear selected items" id="actionCle" onclick="doItemAction('cle')"><i class="fas fa-times"></i></span>
+            <span class="f-action" title="Clear selected items" id="actionCle" onclick="doItemAction('cle')"><i class="far fa-times-circle"></i></span>
             <span class="f-action" title="Switch item favorite mode" id="actionFav" onclick="doItemAction('fav')"><i class="far fa-star"></i></i></span>
             <span class="f-action" title="Delete selected items" id="actionDel" onclick="doItemAction('del')"><i class="far fa-trash-alt"></i></span>
             <span class="f-action" title="Edit an item" id="actionEdi" onclick="doItemAction('edi')" style="margin-right: 25px;"><i class="far fa-edit"></i></span>

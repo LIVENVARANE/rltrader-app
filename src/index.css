@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 * {
     pointer-events: auto;
@@ -7,7 +8,7 @@
 html, body {
     margin: 0;
     padding: 0;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: 'Archivo', sans-serif;
     user-select: none;
     pointer-events: none !important;
 }
@@ -18,6 +19,7 @@ html, body {
 
 ::-webkit-scrollbar-track {
   background-color: #e2e2e2;
+  border-bottom-right-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -44,8 +46,8 @@ header img {
 }
 
 header .settings-btn {
-    transform: rotate(0turn);
-    opacity: 1;
+    transform: rotate(0.25turn);
+    opacity: 0.8;
     font-size: 23px;
     top: 0px;
     margin-right: 20px;
@@ -55,7 +57,7 @@ header .settings-btn {
 }
 
 header .settings-btn:hover {
-    transform: rotate(0.25turn);
+    transform: rotate(0.5turn);
 }
 
 header .control-btn {
@@ -177,10 +179,15 @@ header i {
     top: 2px;
     -webkit-app-region: no-drag;
 
+    
+}
+
+header .important {
+    opacity: 0.8;
     transition: 0.2s ease-out opacity;
 }
 
-header i:hover {
+header .important:hover {
     opacity: 1;
 }
 
@@ -191,6 +198,7 @@ header i:hover {
     width: 100%;
     height: 100%;
     background-color: rgba(66, 66, 66, 0.3);
+    backdrop-filter: blur(2px);
 }
 
 #settingswindow #settings-page {
@@ -279,6 +287,7 @@ header i:hover {
     font-weight: normal;
     text-align: left;
     margin: 0px 0px 10px 13%;
+    font-size: 16px;
 }
 
 #settingswindow #settings-page .content h5 {
@@ -291,7 +300,7 @@ header i:hover {
 #settingswindow #settings-page .content select {
     outline: none;
     padding: 3px 20px 3px 5px;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 #settingswindow #settings-page .content ul {
@@ -318,7 +327,7 @@ header i:hover {
 #settingswindow #settings-page .content .checkbox {
     display: inline-block;
     padding: 5px 10px;
-    border-radius: 15px;
+    border-radius: 5px;
     background-color: rgb(255, 107, 129);
     color: white;
     cursor: pointer;
@@ -366,6 +375,7 @@ header i:hover {
     width: 100%;
     height: 100%;
     background-color: rgba(66, 66, 66, 0.3);
+    backdrop-filter: blur(2px);
 }
 
 #edititemwindow #edititemimage {
@@ -438,6 +448,8 @@ header i:hover {
     left: 220px;
     z-index: 1;
     box-shadow: 0px 0px 15px -3px rgba(0,0,0,0.41);
+    display: flex;
+    flex-wrap: wrap;
     
     visibility: hidden;
 }
@@ -445,15 +457,52 @@ header i:hover {
 #edititemwindow #edititem-page #colorpicker1 li {
     background-color: grey;
     list-style-type: none;
-    padding: 1px 9px;
+    font-weight: 200;
+    font-style: italic;
+    padding: 10px 9px;
     cursor: pointer;
+    text-align: center;
+    filter: brightness(100%);
+    min-width: 25%;
+    height: 20px;
+    flex-grow: 1;
 
     display: none;
-    transition: 0.1s ease-out padding;
+    transition: 0.1s ease-out filter;
+}
+
+#edititemwindow #edititem-page #colorpicker1 li:first-child {
+    text-align: center;
+    display: list-item;
+    border-radius: 5px 5px 0px 0px;
+    font-weight: bold;
+    font-style: normal;
+    padding: 7px 0px;
+    color: white;
+    background: linear-gradient(to right, #4776E6, #8e54e9);
+    cursor: default;
+    width: 100%;
+    height: unset;
+}
+
+#edititemwindow #edititem-page #colorpicker1 li:last-child {
+    font-style: normal;
+    font-weight: bold;
+    text-align: center;
+    display: list-item;
+    border-radius: 0px 0px 5px 5px;
+    width: 100%;
+    height: unset;
+    color: white;
+    background: linear-gradient(to right, #4776E6, #8e54e9);
+}
+
+#edititemwindow #edititem-page #colorpicker1 li:first-child:hover {
+    filter: brightness(100%);
 }
 
 #edititemwindow #edititem-page #colorpicker1 li:hover {
-    padding: 1px 15px;
+    filter: brightness(120%);
 }
 
 #edititemwindow #edititem-page .edit-ie-footer {
@@ -606,6 +655,181 @@ header i:hover {
     border-radius: 25px;
 }
 
+#infowindow {
+    visibility: hidden;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(66, 66, 66, 0.3);
+    backdrop-filter: blur(2px);
+}
+
+#infowindow #info-page {
+    background-color: white;
+    border-radius: 10px;
+    width: 560px;
+    height: 610px;
+    padding: 10px;
+    cursor: default;
+    border-bottom: 3px solid grey;
+    position: relative;
+    top: 66px;
+}
+
+#infowindow #info-page .close {
+    position: absolute;
+    color: white;
+    right: 5px;
+    top: 3px;
+    padding: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+#infowindow #info-page .info-header {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 170px;
+    border-radius: 10px;
+    background-color: #BC7C9C;
+    color: white;
+}
+
+#infowindow #info-page .info-header img {
+    height: 100px;
+    opacity: 1;
+    width: 100;
+    border-radius: 4px;
+    margin: 35px;;
+}
+
+#infowindow #info-page .info-header video {
+    height: 100px;
+    opacity: 1;
+    width: 100;
+    border-radius: 4px;
+    margin: 35px;;
+}
+
+#infowindow #info-page .info-header .text {
+    position: absolute;
+    right: 35px;
+    top: 35px;
+    height: calc(100% - 70px);
+    width: 375px;
+}
+
+#infowindow #info-page .info-header .text h1 {
+    display: inline;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+#infowindow #info-page .info-header #infofavorite {
+    margin-top: 0px;
+    margin-bottom: 10px;
+    font-size: 22px;
+    margin-right: 5;
+    position: relative;
+    top: -2px;
+    color: #e8ea39;
+}
+
+#infowindow #info-page .info-header .text h4 {
+    margin: 8px 0px;
+}
+
+#infowindow #info-page .info-header .text h4 span {
+    display: inline-block;
+    margin: 2px 3px;
+    font-weight: normal;
+    padding: 3px 5px;
+    border-radius: 6px;
+}
+
+#infowindow #info-page .info-header .text h4 #inforarity {
+    background-color: rgb(219, 219, 219);
+    color: black;
+}
+
+#infowindow #info-page .info-header .text h4 #infonumber {
+    background-color: rgb(219, 219, 219);
+    color: black;
+}
+
+#infowindow #info-page .info-header .text h4 #infotime {
+    background-color: rgb(219, 219, 219);
+    color: black;
+}
+
+#infowindow #info-page #itemchart {
+    position: relative;
+    top: 170px;
+}
+
+#infowindow #info-page #itemchart .apexcharts-canvas .apexcharts-zoom-icon.apexcharts-selected svg, .apexcharts-canvas .apexcharts-selection-icon.apexcharts-selected svg, .apexcharts-canvas .apexcharts-reset-zoom-icon.apexcharts-selected svg {
+    fill: #BC7C9C;
+}
+
+#infowindow #info-page #itemchart .apexcharts-pan-icon.apexcharts-selected svg {
+    stroke: #BC7C9C;
+}
+
+#infowindow #info-page #itemchart .apexcharts-menu {
+    display: none;
+}
+
+.apexcharts-xaxis-annotations {
+    transition: 0.2s ease;
+}
+
+#infowindow #info-page button {
+    margin-top: 165px;
+    border: none;
+    background-color: #7A5980;
+    color: white;
+    padding: 4px 7px;
+    border-radius: 7px;
+    font-weight: bold;
+    outline: none;
+    cursor: pointer;
+    transition: 0.2s ease background-color;
+}
+
+#infowindow #info-page button:hover {
+    background-color: #3B3B58;
+}
+
+#infowindow #info-page h3 {
+    font-size: 14px;
+}
+
+#infowindow #info-page .info-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: calc(100% - 20px);
+    background: linear-gradient(to right, #7A5980, #3B3B58);
+    padding: 20px 0px;
+    border-radius: 10px;
+    cursor: pointer;
+
+    transition: 0.2s ease border-radius;
+}
+
+#infowindow #info-page .info-btn:hover {
+    border-radius: 20px;
+}
+
+#infowindow #info-page .info-btn i {
+    color: white;
+    font-size: 25px;
+}
+
 #additemwindow {
     visibility: hidden;
     position: fixed;
@@ -613,6 +837,7 @@ header i:hover {
     width: 100%;
     height: 100%;
     background-color: rgba(66, 66, 66, 0.3);
+    backdrop-filter: blur(2px);
 }
 
 #additemwindow .aiw-container {
@@ -736,13 +961,22 @@ header i:hover {
     font-weight: 500;
 }
 
+#additemwindow #iteminfo .ie-footer {
+    width: calc(100% + 40px);
+    left: -20px;
+    top: 35px;
+    position: relative;
+}
+
 #additemwindow #iteminfo #colorpicker {
     position: absolute;
     width: 244px;
     top: 212px;
-    left: 528px;
+    left: 532px;
     z-index: 1;
     box-shadow: 0px 0px 15px -3px rgba(0,0,0,0.41);
+    display: flex;
+    flex-wrap: wrap;
 
     visibility: hidden;
 }
@@ -750,15 +984,52 @@ header i:hover {
 #additemwindow #iteminfo #colorpicker li {
     background-color: grey;
     list-style-type: none;
-    padding: 1px 9px;
+    font-weight: 200;
+    font-style: italic;
+    padding: 10px 9px;
     cursor: pointer;
+    text-align: center;
+    filter: brightness(100%);
+    min-width: 25%;
+    height: 20px;
+    flex-grow: 1;
 
     display: none;
-    transition: 0.1s ease-out padding;
+    transition: 0.1s ease-out filter;
+}
+
+#additemwindow #iteminfo #colorpicker li:first-child {
+    text-align: center;
+    display: list-item;
+    border-radius: 5px 5px 0px 0px;
+    font-weight: bold;
+    font-style: normal;
+    padding: 7px 0px;
+    color: white;
+    background: linear-gradient(to right, #4776E6, #8e54e9);
+    cursor: default;
+    width: 100%;
+    height: unset;
+}
+
+#additemwindow #iteminfo #colorpicker li:last-child {
+    font-style: normal;
+    font-weight: bold;
+    text-align: center;
+    display: list-item;
+    border-radius: 0px 0px 5px 5px;
+    width: 100%;
+    height: unset;
+    color: white;
+    background: linear-gradient(to right, #4776E6, #8e54e9);
+}
+
+#additemwindow #iteminfo #colorpicker li:first-child:hover {
+    filter: brightness(100%);
 }
 
 #additemwindow #iteminfo #colorpicker li:hover {
-    padding: 1px 15px;
+    filter: brightness(120%);
 }
 
 #additemwindow #iteminfo #itemimage {
@@ -789,6 +1060,7 @@ header i:hover {
 .ie-footer h4 {
     font-weight: bold;
     text-align: center;
+    font-size: 14px;
 }
 
 .ie-footer .additembutton {
@@ -824,7 +1096,7 @@ header i:hover {
     position: relative;
     top: 250px;
 
-    animation: wt-enter 3s ease-out forwards;
+    animation: wt-enter 3s ease-in-out forwards;
 }
 
 @keyframes wt-enter {
@@ -893,6 +1165,7 @@ header i:hover {
     margin: 10px;
     border-radius: 15px;
     cursor: pointer;
+    box-shadow: rgb(100 100 111 / 21%) 0px 7px 29px 0px;
 
     transition: ease-out 0.7s border-radius;
 }
@@ -940,6 +1213,14 @@ footer {
     z-index: 0;
 }
 
+footer #f-username {
+    font-weight: 800;
+    font-style: italic;
+    font-weight: bold; 
+    line-height: 3; 
+    font-family: 'Archivo', sans-serif;
+}
+
 footer span {
     display: inline-block;
     font-family: 'Ubuntu', sans-serif;
@@ -963,7 +1244,7 @@ footer .new-item {
 }
 
 footer .new-item:hover {
-    background-color: #7e5279;
+    backdrop-filter: blur(4px);
 }
 
 footer #selectedtitle {
@@ -1008,6 +1289,8 @@ footer .f-white {
 footer .f-white i {
     position: relative;
     top: 0px;
+    transform: rotate(0deg);
+    transition: 0.2s ease;
 }
 
 footer .separator {
@@ -1025,6 +1308,7 @@ footer .separator {
     font-size: 46px;
     font-weight: bold;
     color: #bfbfbf;
+    font-style: italic;
 }
 
 #inv-tutorial h4 {
@@ -1032,6 +1316,7 @@ footer .separator {
     color: #bc7c9c;
     margin-top: 10px;
     font-size: 22px;
+    font-style: normal;
 }
 
 #inv-tutorial a {
@@ -1046,10 +1331,12 @@ footer .separator {
 
 #inv-container {
     padding: 20px 20px 53px 20px;
+    padding-top: 10px;
+    background-color: white;
     position: absolute;
     bottom: 0px;
     z-index: -3;
-    height: 667px;
+    height: 677px;
     width: 1110px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -1076,6 +1363,9 @@ footer .separator {
     margin: 15px;
     display: inline-flex;
     cursor: pointer;
+    /* transition: 0.2s ease; */
+    overflow-y: hidden;
+    overflow-x: hidden;
 }
 
 #inv-container .item:hover > .selectcontainer {
@@ -1120,12 +1410,16 @@ footer .separator {
 #inv-container .item .info .itemname {
     font-weight: bold;
     height: fit-content;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 500;
 }
 
 #inv-container .item .info .bigitemname {
     font-weight: bold;
     height: fit-content;
     font-size: 80%;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 500;
 }
 
 #inv-container .item .info .itemcolor {
@@ -1144,7 +1438,7 @@ footer .separator {
     color: black;
     padding: 5px 10px;
     margin: 7px 25px;
-    border-radius: 5px;
+    border-radius: 15px;
     display: inline-block;
     text-align: center;
     width: 170px;
@@ -1157,7 +1451,8 @@ footer .separator {
 #inv-container .item .info .itemprice {
     position: absolute;
     bottom: 0px;
-    font-weight: bold;
+    font-style: italic;
+    font-weight: 300;
     opacity: 1;
     transition: 0.2s ease opacity;
 }
@@ -1165,9 +1460,35 @@ footer .separator {
 #inv-container .item .info .itempercent {
     position: absolute;
     bottom: 0px;
-    font-weight: bold;
+    font-style: italic;
+    font-weight: 300;
     opacity: 0;
     transition: 0.2s ease opacity;
+}
+
+#inv-container .item .itemchart {
+    display: none;
+    position: relative;
+    top: -127px;
+    min-height: unset !important;
+}
+
+#inv-container .item .apexcharts-canvas {
+    position: absolute;
+    right: 0px;
+    height: 0px !important;
+}
+
+#inv-container .item .apexcharts-tooltip.apexcharts-theme-light {
+    cursor: pointer;
+}
+
+#inv-container .item .apexcharts-xaxis-tick {
+    display: none !important;
+}
+
+#inv-container .item .apexcharts-xaxistooltip {
+    display: none;
 }
 
 .alertbox {
@@ -1190,6 +1511,7 @@ footer .separator {
     width: 100%;
     height: 100%;
     background-color: rgba(66, 66, 66, 0.3);
+    backdrop-filter: blur(2px);
 }
 
 .dialogbox-container .dialogbox {
@@ -1279,3 +1601,55 @@ footer .separator {
     bottom: 0px;
     right: 30px;
 }
+
+#contextmenu {
+    display: none;
+    opacity: 0;
+    position: fixed;
+    border-radius: 5px;
+    box-shadow: #0000004a 0 0 9px 0px;
+    transition: 0.2s ease opacity;
+    z-index: 1;
+}
+
+#contextmenu li {
+    font-weight: bold;
+    list-style-type: none;
+    padding: 7px 10px;
+    border-bottom: 1px gainsboro solid;
+    background-color: white;
+    color: #242435;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: 0.2s ease background-color;
+}
+
+#contextmenu li:first-child {
+    padding-top: 15px;
+    border-radius: 5px 5px 0px 0px;
+}
+
+#contextmenu li:last-child {
+    border-bottom: none !important;
+    color: red !important;
+    padding-bottom: 15px;
+    border-radius: 0px 0px 5px 5px;
+}
+
+#contextmenu li:hover {
+    background-color: #dededed1;
+}
+
+#contextmenu li i {
+    font-weight: normal;
+    margin-right: 10px;
+    color: black !important;
+}
+
+#contextmenu li img {
+    width: 18px;
+    margin-right: 10px;
+    position: relative;
+    top: 2px;
+}
+

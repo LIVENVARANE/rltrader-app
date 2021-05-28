@@ -40,8 +40,7 @@ function createWindow() {
   app.on('ready', () => {
     createWindow();
     win.loadFile('src/loading.html');
-    setTimeout(function(){ 
-      
+    setTimeout(function() {
       win.loadFile('src/index.html');
   }, 2000);  
   })
