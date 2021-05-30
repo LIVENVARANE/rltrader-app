@@ -717,6 +717,7 @@ function startConfig(type) {
 
             userDataContent.didFirstConnect = 1;
             userDataContent.username = username_field.value;
+            userDataContent.idIncrement = 0;
             userDataContent.inventory = [];
             userDataContent.settings = {};
             

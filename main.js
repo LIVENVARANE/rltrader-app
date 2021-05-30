@@ -1,13 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const { autoUpdater } = require('electron-updater');
-const log = require('electron-log');
 const path = require('path')
 
 let win;
-
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
-log.info('App starting...');
 
 const iconPath = process.platform !== 'darwin'
     ? 'src/assets/icons/icon.ico'
@@ -87,6 +82,5 @@ function createWindow() {
   });
 
   function sendStatusToWindow(text) {
-    log.info(text);
     win.webContents.send('message', text);
   }
